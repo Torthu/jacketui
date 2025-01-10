@@ -1,0 +1,20 @@
+{
+  "name": "@thune/jacketui",
+  "workspaces": [
+    "packages/base",
+    "packages/components"
+  ],
+  "scripts": {
+    "publish": "npm run build && npm run publish --workspaces",
+    "publish-base": "npm run publish --workspace=packages/base",
+    "publish-components": "npm run publish --workspace=packages/components",
+    "build": "npm run build-base && npm run build-components",
+    "build-base": "npm run build --workspace=packages/base",
+    "build-components": "npm run build --workspace=packages/components",
+    "link": "npm link --workspaces"
+  },
+  "devDependencies": {
+    "rimraf": "^6.0.1",
+    "typescript": "^5.7.3"
+  }
+}
