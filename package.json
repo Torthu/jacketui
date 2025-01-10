@@ -1,13 +1,13 @@
 {
-  "name": "@thune/jacketui",
+  "name": "@torthu/jacketui",
   "workspaces": [
     "packages/base",
     "packages/components"
   ],
   "scripts": {
-    "publish": "npm run build && npm run publish --workspaces",
-    "publish-base": "npm run publish --workspace=packages/base",
-    "publish-components": "npm run publish --workspace=packages/components",
+    "publish": "npm run build && npm publish --workspaces",
+    "publish-base": "npm run build-base && npm publish --workspace=packages/base --access public",
+    "publish-components": "npm publish --workspace=packages/components",
     "build": "npm run build-base && npm run build-components",
     "build-base": "npm run build --workspace=packages/base",
     "build-components": "npm run build --workspace=packages/components",

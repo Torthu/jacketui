@@ -1,5 +1,5 @@
 {
-  "name": "@thune/jacketui-base",
+  "name": "@torthu/jacketui-base",
   "version": "1.0.0",
   "description": "Base utils for JacketUI component system.",
   "main": "dist/index.js",
