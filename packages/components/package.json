@@ -1,0 +1,26 @@
+{
+  "name": "@torthu/jacketui-components",
+  "version": "0.1.0",
+  "description": "JacketUI component system for React.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "author": {
+    "name": "Torstein Thune",
+    "email": "torstein@thune.io",
+    "url": "https://thune.io"
+  },
+  "dependencies": {
+    "@heroicons/react": "*"
+  },
+  "peerDependencies": {
+    "react": "*"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.3",
+    "react": "18.2.0"
+  },
+  "scripts": {
+    "prepublish": "npm run build",
+    "build": "rimraf ./dist && tsc"
+  }
+}
