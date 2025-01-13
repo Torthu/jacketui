@@ -1,7 +1,7 @@
 import React from "react";
-import { BaseComponent, BaseComponentProps } from "@thune/jacketui-base";
+import { BaseComponent, BaseComponentProps } from "@torthu/jacketui-base";
 
-export const variants = {
+const variants = {
   default: "",
   submit:
     "rounded bg-blue-600 px-2 py-1 font-medium text-white hover:bg-blue-700",
@@ -19,6 +19,8 @@ export const variants = {
   pill: "px-4 py-1 rounded-full border bg-white bg-opacity-0 hover:bg-opacity-20 active:bg-opacity-40 border-gray-400  hover:cursor-pointer",
   info: "flex-0 w-5 h-5 text-xs text-white border border-white opacity-70 hover:opacity-100 hover:text-white hover:opacity-100 rounded-full",
 };
+
+export const buttonVariants = variants;
 
 export interface ButtonProps
   extends BaseComponentProps<

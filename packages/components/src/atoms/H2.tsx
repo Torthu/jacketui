@@ -1,5 +1,5 @@
 import React from "react";
-import { BaseComponent, BaseComponentProps } from "@thune/jacketui-base";
+import { BaseComponent, BaseComponentProps } from "@torthu/jacketui-base";
 
 /** H2
  * subheader - text-xl font-extralight

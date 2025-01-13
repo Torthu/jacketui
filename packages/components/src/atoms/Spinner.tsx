@@ -1,5 +1,5 @@
 import React from "react";
-import { BaseComponent, BaseComponentProps } from "@thune/jacketui-base";
+import { BaseComponent, BaseComponentProps } from "@torthu/jacketui-base";
 
 const base =
   "rounded-full border-4 border-l-transparent border-r-transparent border-b-transparent border-t-current animate-[spin_0.5s_linear_infinite]";

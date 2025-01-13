@@ -1,4 +1,10 @@
-import React, { RefObject, useLayoutEffect, useRef, useState } from "react";
+import React, {
+  MutableRefObject,
+  RefObject,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { BaseComponent, BaseComponentProps, As } from "@torthu/jacketui-base";
 
 export interface InputProps
@@ -48,7 +54,7 @@ const variants = {
  *
  * @returns ReactNode
  */
-export default function Input({
+export function Input({
   className = "",
   as = "input",
   variant = "default",

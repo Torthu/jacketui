@@ -1,6 +1,6 @@
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import React from "react";
-import { BaseComponent, BaseComponentProps } from "@thune/jacketui-base";
+import { BaseComponent, BaseComponentProps } from "@torthu/jacketui-base";
 import { FlexRow } from "../atoms";
 
 interface FilterInputProps extends BaseComponentProps {

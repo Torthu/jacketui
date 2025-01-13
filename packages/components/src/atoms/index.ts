@@ -1,4 +1,5 @@
 export * from "./Button";
+export * from "./ButtonGroup";
 export * from "./FlexCol";
 export * from "./FlexRow";
 export * from "./SubText";

@@ -1,5 +1,5 @@
 import React from "react";
-import { BaseComponent, BaseComponentProps } from "@thune/jacketui-base";
+import { BaseComponent, BaseComponentProps } from "@torthu/jacketui-base";
 
 /** Paragraph
  * Basic paragraph

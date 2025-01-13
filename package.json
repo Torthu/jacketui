@@ -2,15 +2,18 @@
   "name": "@torthu/jacketui",
   "workspaces": [
     "packages/base",
-    "packages/components"
+    "packages/components",
+    "packages/forms"
   ],
   "scripts": {
     "publish": "npm run build && npm publish --workspaces",
     "publish-base": "npm run build-base && npm publish --workspace=packages/base --access public",
     "publish-components": "npm publish --workspace=packages/components",
-    "build": "npm run build-base && npm run build-components",
+    "publish-forms": "npm publish --workspace=packages/forms",
+    "build": "npm run build-base && npm run build-components && npm run build-forms",
     "build-base": "npm run build --workspace=packages/base",
     "build-components": "npm run build --workspace=packages/components",
+    "build-forms": "npm run build --workspace=packages/forms",
     "link": "npm link --workspaces"
   },
   "devDependencies": {

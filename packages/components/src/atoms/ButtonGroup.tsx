@@ -1,14 +1,14 @@
 import React from "react";
-import { BaseComponent, BaseComponentProps, As } from "@torthu/jacketui-base";
-const base = "px-2 py-0 rounded-full ";
+import { BaseComponent, BaseComponentProps } from "@torthu/jacketui-base";
+import { FlexRow } from ".";
+
+const base = "gap-2 p-2";
 
 const variants = {
-  default: base + "border bg-gray-500 border-gray-400 text-white",
-  info: base + "bg-blue-500",
-  rrule: "px-1 rounded-full text-gray-500 border border-gray-500",
+  default: base + " border border-gray-600 rounded-md",
+  spread: base + " border border-gray-600 rounded-md justify-between",
+  dialog: " pt-4 mt-4 border-t border-gray-600 justify-between",
 };
-
-export type PillProps = BaseComponentProps<keyof typeof variants, As>;
 
 /** Button
  *
@@ -16,16 +16,16 @@ export type PillProps = BaseComponentProps<keyof typeof variants, As>;
  * @param variant {string} (default: default) Variants: default | submit
  *
  * @example
- *   <Button variant="submit" as="a">I'm a link disguised as a submit button!</Button>
+ *   <ButtonGroup><Button>Button A</Button><Button>Button B</Button></ButtonGroup>
  *
  * @returns ReactNode
  */
-export function Pill({
+export function ButtonGroup({
   className = "",
-  as = "div",
+  as = FlexRow,
   variant = "default",
   ...rest
-}: PillProps) {
+}: BaseComponentProps<keyof typeof variants>) {
   const variantClasses = variants[variant] ?? variants["default"];
 
   className = `${variantClasses} ${className}`;
