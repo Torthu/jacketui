@@ -1,6 +1,6 @@
 {
   "name": "@torthu/jacketui-components",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "JacketUI component system for React.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -10,7 +10,8 @@
     "url": "https://thune.io"
   },
   "dependencies": {
-    "@heroicons/react": "*"
+    "@heroicons/react": "*",
+    "@torthu/jacketui-base": "*"
   },
   "peerDependencies": {
     "react": "*"

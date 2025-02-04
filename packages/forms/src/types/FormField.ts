@@ -3,10 +3,9 @@ import { Validation } from ".";
 export interface FormField<T = string> {
   value: T;
   validation: Validation[];
-  touched: boolean;
-  focus?: boolean;
-  hasHadFocus?: boolean;
-  hasBeenBlurred?: boolean;
+  touched: boolean; // Field has had focus
+  pristine: boolean; // Field has been changed
+  focus?: boolean; // Field currently has focus
   forceShowValidation?: boolean;
   forceHideValidation?: boolean;
 }
