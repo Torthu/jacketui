@@ -1,0 +1,25 @@
+{
+  "name": "@torthu/jacketui-router",
+  "version": "0.1.0",
+  "description": "Simple Router implementation.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "author": {
+    "name": "Torstein Thune",
+    "email": "torstein@thune.io",
+    "url": "https://thune.io"
+  },
+  "peerDependencies": {
+    "react": "*",
+    "tailwind-merge": "*"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.3",
+    "react": "18.2.0",
+    "tailwind-merge": "latest"
+  },
+  "scripts": {
+    "prepublish": "npm run build",
+    "build": "rimraf ./dist && tsc"
+  }
+}

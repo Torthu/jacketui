@@ -3,17 +3,20 @@
   "workspaces": [
     "packages/base",
     "packages/components",
-    "packages/forms"
+    "packages/forms",
+    "packages/router"
   ],
   "scripts": {
     "publish": "npm run build && npm publish --workspaces",
     "publish-base": "npm run build-base && npm publish --workspace=packages/base --access public",
     "publish-components": "npm publish --workspace=packages/components",
     "publish-forms": "npm run build-forms && npm publish --workspace=packages/forms",
+    "publish-router": "npm run build-router && npm publish --workspace=packages/router",
     "build": "npm run build-base && npm run build-components && npm run build-forms",
     "build-base": "npm run build --workspace=packages/base",
     "build-components": "npm run build --workspace=packages/components",
     "build-forms": "npm run build --workspace=packages/forms",
+    "build-router": "npm run build --workspace=packages/router",
     "link": "npm link --workspaces"
   },
   "devDependencies": {
