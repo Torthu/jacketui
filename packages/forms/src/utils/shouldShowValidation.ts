@@ -1,5 +1,6 @@
-import { FormField, FormOptionsField } from "../types";
+import { FormField, FormOptionsField, Validation } from "../types";
 import { fieldHasError } from "./fieldHasError";
+import { getFieldValidation } from "./getFieldValidation";
 
 /** shouldShowValidation
  *  Standard strategy for when an error should be displayed.
@@ -9,11 +10,12 @@ import { fieldHasError } from "./fieldHasError";
  * @returns boolean
  */
 export const shouldShowValidation = (
-  field: FormField | FormOptionsField
+  field: FormField<unknown> | FormOptionsField<unknown>,
+  severity: Validation["severity"] = "error"
 ): boolean => {
   return (
     (field.touched || field.forceShowValidation === true) &&
     field.forceHideValidation !== true &&
-    fieldHasError(field)
+    getFieldValidation(field, { severity }).length > 0
   );
 };

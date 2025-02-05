@@ -25,26 +25,20 @@ export const getFieldValidation = <T = any>(
   let validationArray: Validation[];
 
   switch (severity) {
-    case "error":
-    case "warning":
-      severityFilter = severity;
-      break;
     case "all":
-    default:
       severityFilter = null;
+      break;
+    default:
+      severityFilter = severity;
       break;
   }
 
   switch (source) {
-    case "server":
-      validationArray = field.validation.filter((v) => v.source === "server");
-      break;
-    case "client":
-      validationArray = field.validation.filter((v) => v.source === "client");
-      break;
     case "all":
-    default:
       validationArray = field.validation;
+      break;
+    default:
+      validationArray = field.validation.filter((v) => v.source === source);
       break;
   }
 

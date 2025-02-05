@@ -1,4 +1,6 @@
+import { Validation } from "./Validation";
+
 export interface FieldValidationFilterOptions {
-  source?: "server" | "client" | "all";
-  severity?: "warning" | "error" | "all";
+  source?: Validation["source"] | "all";
+  severity?: Validation["severity"] | "all";
 }
