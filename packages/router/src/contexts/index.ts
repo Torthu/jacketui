@@ -1,2 +1,2 @@
-export * from "./CurrentRouteContext";
+export * from "./RouterContext";
 export * from "./RouteContext";

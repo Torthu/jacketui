@@ -1,10 +1,15 @@
-import { Fragment, memo, useContext, useMemo } from "react";
-import { CurrentRouteContext, RouterContext } from ".";
 import { BaseComponent, BaseComponentProps } from "@torthu/jacketui-base";
-import { matchRoute } from "./matchRoute";
-import { joinRoutePaths } from "./joinRoutePath";
+import { Fragment, useMemo } from "react";
+import { RouteContext } from "../contexts";
+import {
+  matchRoute,
+  joinRoutePaths,
+  createRouteRegex,
+  getParameters,
+} from "../helpers";
+import { useRoute } from "../hooks";
 
-interface RouteProps extends BaseComponentProps {
+export interface RouteProps extends BaseComponentProps {
   path: string;
   [key: string]: unknown;
 }
@@ -23,37 +28,31 @@ interface RouteProps extends BaseComponentProps {
  *     <Route path="/:somepathprop" as={({somepathprop}) => <>Hello, {somepathprop}</> />} />
  *   </Router>
  */
-export const Route = memo(({ path, as = Fragment, ...rest }: RouteProps) => {
-  const { currentPath } = useContext(RouterContext);
-  const { routePath } = useContext(CurrentRouteContext);
+export const Route = ({ path, as = Fragment, ...rest }: RouteProps) => {
+  const { rootPath, currentPath, routeSegments } = useRoute();
 
-  const joinedPaths = useMemo(
-    () => joinRoutePaths(routePath, path),
-    [routePath, path]
+  // outermost route
+  const segments = useMemo(
+    () => [...routeSegments, path],
+    [routeSegments, path]
   );
 
-  const [routeMatched, routeProps = {}, basePath] = useMemo(
-    () => matchRoute(joinedPaths, currentPath, { loose: false }),
-    [joinedPaths, currentPath]
+  const routePath = useMemo(() => joinRoutePaths(...segments), [segments]);
+
+  const { pattern, keys } = useMemo(
+    () => createRouteRegex(routePath, false),
+    [routePath]
   );
 
-  if (routeMatched) {
-    console.log("matched", {
-      routePath,
-      path,
-      routeProps,
-      joinedPaths,
-      basePath,
-    });
-  } else {
-    console.log("!matched", {
-      routePath,
-      path,
-      routeProps,
-      joinedPaths,
-      basePath,
-    });
-  }
+  const routeMatched = useMemo(
+    () => matchRoute(pattern, currentPath),
+    [pattern, currentPath]
+  );
+
+  const routeProps = useMemo(
+    () => (routeMatched ? getParameters(currentPath, pattern, keys) : null),
+    [pattern, keys, routeMatched]
+  );
 
   const RouteComponent = useMemo(() => {
     if (routeMatched) {
@@ -66,13 +65,19 @@ export const Route = memo(({ path, as = Fragment, ...rest }: RouteProps) => {
 
   if (RouteComponent) {
     return (
-      <CurrentRouteContext.Provider
-        value={{ routeProps, currentPath, routePath: joinedPaths }}
+      <RouteContext.Provider
+        value={{
+          rootPath,
+          routeProps,
+          currentPath,
+          routePath,
+          routeSegments: segments,
+        }}
       >
         <RouteComponent {...rest} />
-      </CurrentRouteContext.Provider>
+      </RouteContext.Provider>
     );
   }
 
-  return null;
-});
+  return <></>;
+};

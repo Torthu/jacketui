@@ -1,7 +1,6 @@
-import { memo, useEffect, useState } from "react";
-import { getHashPath } from "./routeUtilts";
-
-import { RouterContext } from "./RouteContext";
+import { memo, useEffect, useMemo, useState } from "react";
+import { getHashPath } from "../helpers";
+import { RouteContext } from "../contexts";
 
 export interface RouterProps {
   children: React.ReactNode;
@@ -10,31 +9,41 @@ export interface RouterProps {
 
 /** Router
  *  Simple router implementation using # urls.
- *  The router listens to hashchange events and updates the RouterContext with currentPath.
+ *  The router listens to hashchange events and updates the RouteContext with currentPath.
  *
  * @example
  *  <Router>
  *    <Route path="/">Hello</Route>
  *  </Router>
  */
-export const Router = memo(
-  ({ children, path = "" }: RouterProps): React.ReactElement => {
-    const [currentPath, setCurrentPath] = useState(getHashPath(location));
+export const Router = ({
+  children,
+  path = "",
+}: RouterProps): React.ReactElement => {
+  const [currentPath, setCurrentPath] = useState(getHashPath(location));
+  const routeSegments = useMemo(() => [path], [path]);
 
-    useEffect(() => {
-      const hashchange = (event: HashChangeEvent): void => {
-        if (event.newURL !== event.oldURL) {
-          setCurrentPath(getHashPath(window.location));
-        }
-      };
-      window.addEventListener("hashchange", hashchange);
-      return () => window.removeEventListener("hashchange", hashchange);
-    }, []);
+  useEffect(() => {
+    const hashchange = (event: HashChangeEvent): void => {
+      if (event.newURL !== event.oldURL) {
+        setCurrentPath(getHashPath(window.location));
+      }
+    };
+    window.addEventListener("hashchange", hashchange);
+    return () => window.removeEventListener("hashchange", hashchange);
+  }, []);
 
-    return (
-      <RouterContext.Provider value={{ currentPath, rootPath: path }}>
-        {children}
-      </RouterContext.Provider>
-    );
-  }
-);
+  return (
+    <RouteContext.Provider
+      value={{
+        currentPath,
+        rootPath: path,
+        routePath: "/",
+        routeSegments,
+        routeProps: {},
+      }}
+    >
+      {children}
+    </RouteContext.Provider>
+  );
+};

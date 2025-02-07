@@ -1,4 +1,4 @@
 import { useContext } from "react";
-import { CurrentRouteContext } from "../contexts";
+import { RouteContext } from "../contexts/RouteContext";
 
-export const useRoute = () => useContext(CurrentRouteContext);
+export const useRoute = () => useContext(RouteContext);

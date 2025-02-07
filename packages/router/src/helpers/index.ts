@@ -1,3 +1,6 @@
 export * from "./matchRoute";
 export * from "./joinRoutePath";
-export { go, back, replace, forward } from "./routeUtilts";
+export * from "./getHashPath";
+export * from "./navigation";
+export * from "./getParameters";
+export * from "./createRouteRegex";
