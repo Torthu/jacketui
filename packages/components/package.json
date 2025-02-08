@@ -1,6 +1,6 @@
 {
   "name": "@torthu/jacketui-components",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "JacketUI component system for React.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -23,5 +23,6 @@
   "scripts": {
     "prepublish": "npm run build",
     "build": "rimraf ./dist && tsc"
-  }
+  },
+  "license": "GPL-3.0-only"
 }

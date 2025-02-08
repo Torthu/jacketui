@@ -1,6 +1,6 @@
 {
   "name": "@torthu/jacketui-base",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Base utils for JacketUI component system.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -21,5 +21,6 @@
   "scripts": {
     "prepublish": "npm run build",
     "build": "rimraf ./dist && tsc"
-  }
+  },
+  "license": "GPL-3.0-only"
 }

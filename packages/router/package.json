@@ -1,6 +1,6 @@
 {
   "name": "@torthu/jacketui-router",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "description": "Simple Router implementation.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -24,5 +24,6 @@
   "scripts": {
     "prepublish": "npm run build",
     "build": "rimraf ./dist && tsc"
-  }
+  },
+  "license": "GPL-3.0-only"
 }

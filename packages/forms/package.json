@@ -1,6 +1,6 @@
 {
   "name": "@torthu/jacketui-forms",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Form components for JacketUI",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -26,5 +26,6 @@
   "scripts": {
     "prepublish": "npm run build",
     "build": "rimraf ./dist && tsc"
-  }
+  },
+  "license": "GPL-3.0-only"
 }
