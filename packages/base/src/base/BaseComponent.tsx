@@ -1,4 +1,4 @@
-import React, { JSX } from "react";
+import React, { Fragment, JSX } from "react";
 import { twMerge } from "tailwind-merge";
 
 export interface BaseComponentProps<
@@ -32,6 +32,11 @@ export function BaseComponent({
   ...rest
 }: BaseComponentProps) {
   const Element = as;
+
+  // React Fragments only support children and keys and will complain if other props are passed
+  if (Element === Fragment) {
+    return <Element children={rest.children} />;
+  }
 
   return (
     <Element
