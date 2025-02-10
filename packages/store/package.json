@@ -1,0 +1,32 @@
+{
+  "name": "@torthu/jacketui-store",
+  "private": "true",
+  "version": "0.1.0",
+  "description": "Simple Store implementation",
+  "main": "index.ts",
+  "directories": {
+    "doc": "docs",
+    "example": "examples",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [
+    "Store",
+    "ELM-Architecture"
+  ],
+  "author": {
+    "email": "torstein@thune.io",
+    "name": "Torstein Thune",
+    "url": "https://thune.io"
+  },
+  "license": "GPL-3.0-only",
+  "devDependencies": {
+    "@types/jest": "^29.5.10",
+    "jest": "^29.7.0",
+    "typescript": "^5.3.2",
+    "react": "19.0.0",
+    "@types/react": "19.0.8"
+  }
+}
