@@ -19,7 +19,7 @@
     "build-components": "npm run build --workspace=packages/components",
     "build-forms": "npm run build --workspace=packages/forms",
     "build-router": "npm run build --workspace=packages/router",
-    "build-translate": "npm run build --workspace=packages/router",
+    "build-translate": "npm run build --workspace=packages/translate",
     "link": "npm link --workspaces"
   },
   "devDependencies": {
