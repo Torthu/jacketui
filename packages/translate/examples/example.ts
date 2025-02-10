@@ -3,8 +3,8 @@ import { Translate } from "../src";
 const translate = new Translate({
   languages: {
     no: { one: "en", two: "to", hello: "Hei ${person}" },
-    fr: { one: "un", two: "deux", hello: "Allô ${person}" },
-    en: { one: "one", two: "two", hello: (props) => `Hello ${props?.person}` },
+    fr: { one: "un", two: "deux", hello: "Allô ${person}" }, // String replacement works through a RegExp
+    en: { one: "one", two: "two", hello: (props) => `Hello ${props?.person}` }, // We can also use a function instead of the built-in RegExp.
   },
   currentLanguage: "no",
 });
