@@ -27,7 +27,6 @@ export interface BaseComponentProps<
 export function BaseComponent({
   as = "div",
   className,
-  hidden,
   // Extract and pass rest to DOM
   ...rest
 }: BaseComponentProps) {
@@ -38,10 +37,5 @@ export function BaseComponent({
     return <Element children={rest.children} />;
   }
 
-  return (
-    <Element
-      className={hidden ? "hidden" : className ? twMerge(className) : ""}
-      {...rest}
-    />
-  );
+  return <Element className={className ? twMerge(className) : ""} {...rest} />;
 }
