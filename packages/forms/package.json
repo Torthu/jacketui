@@ -1,6 +1,6 @@
 {
   "name": "@torthu/jacketui-forms",
-  "version": "0.4.1",
+  "version": "0.5.1",
   "description": "Form components for JacketUI",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
