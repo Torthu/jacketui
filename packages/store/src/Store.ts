@@ -1,3 +1,5 @@
+import { referenceComparison } from "./comparison/referenceComparison";
+
 interface StateChangedCallback<State> {
   (getState: () => State): void;
 }
@@ -50,60 +52,60 @@ export type ActionHandler<State, Action> =
 interface ModelConstructorProps<State, Action> {
   initialState: State;
   actionHandlers: ActionHandler<State, Action>[];
-  hashingFunction: HashingFunction<State>;
+  compareFunction?: (oldState: State, newState: State) => boolean;
   onStateChanged?: StateChangedCallback<State>;
 }
 
 /**
  * The model contains the current state plus action handlers to update said state
  */
-export default class Model<State, Action> {
-  private dataHash = "";
+export class Store<State, Action> {
   private actionHandlers: ActionHandler<State, Action>[];
   private state: State;
   private stateChangedCallbacks: StateChangedCallback<State>[];
   private preStateChangedCallbacks: StateAboutToChangeCallback<State, Action>[];
-  private hashingFunction: HashingFunction<State>;
+  private compareFunction: (oldState: State, newState: State) => boolean;
 
-  /**
-   * TODO: Check out new JS strutured clone
-   * Deep Clone a structure (Object/Array) recursively
-   * Will not clone Function or RegExp or Date
-   * @param structure
-   * @returns structure
+  /** cloneDeep
+   *  Utility for cloning a structure.
+   *  Useful for cloning the store state before updating it.
+   *
+   *  Deep Clone a structure (Object/Array) recursively.
+   *  Will not clone Function or RegExp or Date.
+   *
+   *  @example
+   *    const actionHandler = (state, action) => {
+   *      const newState = Store.cloneDeep(state);
+   *      newState.a = "new value";
+   *      return newState;
+   *    }
+   *
+   *  @param structure
+   *  @returns structure
    */
   public static cloneDeep<T = any>(structure: T): T {
     return structuredClone(structure);
-    // const clonedStructure: any = Array.isArray(structure) ? [] : {};
-
-    // if (
-    //   typeof structure === "function" ||
-    //   structure instanceof RegExp ||
-    //   structure instanceof Date
-    // ) {
-    //   return structure;
-    // }
-
-    // for (let key in structure) {
-    //   const value = structure[key];
-
-    //   if (Array.isArray(value) || typeof value === "object") {
-    //     clonedStructure[key] = Model.cloneDeep(value);
-    //   } else {
-    //     clonedStructure[key] = value;
-    //   }
-    // }
-
-    // return clonedStructure as T;
   }
 
-  /**
-   * Clone a specific path of a structure
-   * Will not clone Function or RegExp or Date
-   * @example clonePath({a: [0], b: {c: [0]}}, ["b", "c"])
-   * @param structure
-   * @param path
-   * @returns
+  /** clonePath
+   *  Clone a specific path of a structure.
+   *  Useful for cloning a specific part of the store state before updating it,
+   *  ensuring React picks up the change.
+   *
+   *  Note: Will not clone Function or RegExp or Date
+   *
+   *  @example
+   *    // With some state: {a: {b: "old value"}, some: "other values", that: "should not be touched"}
+   *    const actionHandler = (state, action) => {
+   *      const newState = Store.clonePath(state, ["a", "b"]); // state, state.a and state.a.b will be new references
+   *      newState.a.b = "new value";
+   *      return newState;
+   *    }
+   *
+   *  @example clonePath({a: [0], b: {c: [0]}}, ["b", "c"])
+   *  @param structure
+   *  @param path
+   *  @returns structure
    */
   public static clonePath<T = any>(
     structure: T,
@@ -114,14 +116,14 @@ export default class Model<State, Action> {
     if (Array.isArray(structure)) {
       const cloned = [...structure];
       if (typeof next === "number") {
-        cloned[next] = Model.clonePath(structure[next], path);
+        cloned[next] = Store.clonePath(structure[next], path);
       }
       return cloned as unknown as T;
     } else if (typeof structure === "object") {
       const cloned: any = { ...structure };
 
       if (next) {
-        cloned[next] = Model.clonePath(
+        cloned[next] = Store.clonePath(
           (structure as unknown as any)[next],
           path
         );
@@ -141,17 +143,28 @@ export default class Model<State, Action> {
     this.setState(Object.assign({}, this.getState(), newState));
   }
 
-  /**
-   * TODO: Useful for enabling plugins, dev tools, etc
-   * Listen to and manipulate actions before they are applied
-   * Triggered before the internal state changes
-   * @param callback StateAboutToChangeCallback<State>
+  /** onPreDataChanged
+   *  Listen to and manipulate actions before they are applied
+   *  Triggered before the internal state changes
+   *
+   *  @param callback StateAboutToChangeCallback<State>
+   *
    */
   public onPreDataChanged(
     callback: StateAboutToChangeCallback<State, Action>
   ): StateAboutToChangeCallback<State, Action> {
     this.preStateChangedCallbacks.push(callback);
     return callback;
+  }
+
+  public offPreDataChanged(
+    callback: StateAboutToChangeCallback<State, Action>
+  ): void {
+    const index = this.preStateChangedCallbacks.indexOf(callback);
+
+    if (index >= 0) {
+      this.preStateChangedCallbacks.splice(index, 1);
+    }
   }
 
   /**
@@ -189,11 +202,18 @@ export default class Model<State, Action> {
   /**
    * Calculates a new data hash using the hashingFunction, then sets new state and triggers onStateChanged if the hash does not match the previous data hash.
    * setState is passed as the commit callback to action handlers.
-   * @param newState
+   *
+   * @param newState - the new state to set
+   * @param [boolean=false] cloneDeep - whether to clone the new state before setting it
+   *
+   * @returns the new state
+   *
+   * @example
+   *   store.setState({...state, a: "new value"});
    */
   public setState(newState: State, cloneDeep: boolean = false): State {
     if (this.isNewState(newState)) {
-      this.state = cloneDeep ? Model.cloneDeep(newState) : newState;
+      this.state = cloneDeep ? Store.cloneDeep(newState) : newState;
       this.stateChangedCallbacks.forEach((callback) => callback(this.getState));
     }
 
@@ -205,15 +225,14 @@ export default class Model<State, Action> {
    * Action handlers are called with getState, the passed action and setState
    * @param action
    */
-  public update(action: Action): void {
+  public dispatch(action: Action): void {
+    this.preStateChangedCallbacks.forEach((callback) =>
+      callback(this.getState(), action)
+    );
     this.actionHandlers.forEach(
       (actionHandler: ActionHandler<State, Action>) => {
         if (isAsyncActionHandler(actionHandler)) {
           // TODO: Do we want this feature?
-          this.preStateChangedCallbacks.forEach((callback) =>
-            callback(this.getState(), action)
-          );
-
           actionHandler(this.getState, action, this.setState);
         } else if (isSyncActionHandler(actionHandler)) {
           this.setState(actionHandler(this.getState(), action));
@@ -223,29 +242,19 @@ export default class Model<State, Action> {
   }
 
   /**
-   * Check if the passed "newState" is different from old state
-   * TODO: Maybe change to reference check if hash is too slow/not useful
-   * @param newState
-   * @returns
+   * Alias for dispatch for backwards compatibility
+   * @deprecated
    */
-  private isNewState(newState: State) {
-    const newDataHash = this.hashingFunction(newState);
-    const oldDataHash = this.getDataHash();
-
-    if (oldDataHash !== newDataHash) {
-      this.dataHash = newDataHash;
-      return true;
-    } else {
-      return false;
-    }
-  }
+  public update = this.dispatch;
 
   /**
-   * Get the current data hash
-   * @returns the current data hash
+   * Check if the passed "newState" is different from old state
+   * @param newState
+   * @returns boolean
    */
-  private getDataHash(): string {
-    return this.dataHash;
+  private isNewState(newState: State) {
+    const oldState = this.getState();
+    return this.compareFunction(oldState, newState);
   }
 
   constructor(props: ModelConstructorProps<State, Action>) {
@@ -254,16 +263,16 @@ export default class Model<State, Action> {
       this.stateChangedCallbacks.push(props.onStateChanged);
     }
     this.preStateChangedCallbacks = [];
-    this.hashingFunction = props.hashingFunction;
+    this.compareFunction = props.compareFunction || referenceComparison;
     this.actionHandlers = props.actionHandlers;
 
     // Bind Scope
     this.setState = this.setState.bind(this);
     this.getState = this.getState.bind(this);
-    this.update = this.update.bind(this);
+    this.dispatch = this.dispatch.bind(this);
+    this.update = this.dispatch.bind(this);
 
     // Set Initial State
-    this.state = props.initialState; // to make compiler happy
-    this.setState(props.initialState);
+    this.state = props.initialState;
   }
 }
