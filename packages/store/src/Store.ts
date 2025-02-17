@@ -29,10 +29,6 @@ export interface UpdateFunction<Action = DefaultAction> {
   (action: Action): void;
 }
 
-export interface HashingFunction<State> {
-  (input: State): string;
-}
-
 function isAsyncActionHandler(
   actionHandler: ActionHandler<any, any>
 ): actionHandler is AsyncActionHandler<any, any> {
