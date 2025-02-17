@@ -9,7 +9,7 @@ import { BasicAction, ActionHandler, Dispatch } from "./types";
  * @param {State} initialState
  * @returns [State, Dispatch<Action>, Store]
  */
-export function useStore<State extends object, Action extends BasicAction>(
+export function useStore<State, Action>(
   actionHandlers: ActionHandler<State, Action>[],
   initialState: State
 ): [State, Dispatch<Action>, Store<State, Action>] {

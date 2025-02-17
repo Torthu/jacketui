@@ -1,4 +1,4 @@
-import { Store, ActionHandler } from "../";
+import { Store, ActionHandler } from "../src/Store";
 
 interface TestState {
   data: string;
@@ -17,13 +17,13 @@ type TestAction =
 
 type TestActionHandler = ActionHandler<TestState, TestAction>;
 
-/**
- * Illustrates a sync action handler
- * This works exactly like the reducer in e.g React useReducer
- */
-const handleUpdateData: TestActionHandler = (state, action) => {
+const handleUpdateData: TestActionHandler = (
+  getState,
+  action: TestAction,
+  commit
+) => {
   if (action.type === "UPDATE_ACTION") {
-    return { ...state, data: action.payload };
+    return { ...getState(), data: action.payload };
   }
 };
 
@@ -47,9 +47,6 @@ const handleAsyncUpdateDate: TestActionHandler = (getState, action, commit) => {
   }
 };
 
-/**
- * Initialze the store with the two action handlers defined above
- */
 const { dispatch, getState, setState } = new Store<TestState, TestAction>({
   initialState: { data: "", pending: [] },
   actionHandlers: [handleUpdateData, handleAsyncUpdateDate],
