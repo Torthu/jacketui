@@ -45,18 +45,9 @@ export const connectDevtools = (
       ...options,
     });
 
-    console.log(options.name, connections);
-
-    const preDataChangedListener = store.onPreDataChanged((state, action) => {
-      try {
-        connection.connection.send(action, state);
-      } catch (e) {
-        console.log(e);
-      }
-    });
+    devToolsConnection.init(initialState);
 
     connections[options.name] = {
-      preDataChangedListener,
       initialState,
       committedState,
       connection: devToolsConnection,
@@ -65,45 +56,54 @@ export const connectDevtools = (
 
   const connection = connections[options.name];
 
-  connection.connection.init(connection.initialState);
+  const preDataChangedListener = store.onPreDataChanged((state, action) => {
+    try {
+      connection.connection.send(action, state);
+    } catch (e) {
+      console.log(e);
+    }
+  });
 
-  connection.connection.subscribe((message: any) => {
-    if (message.type === "START") {
-      connection.connection.init(connection.initialState);
-    } else if (message.type === "DISPATCH") {
-      switch (message.payload?.type) {
-        case "RESET":
-          store.setState(connection.initialState);
-          break;
-        case "ROLLBACK":
-          store.setState(JSON.parse(message.state));
-          break;
-        case "JUMP_TO_ACTION":
-          store.setState(JSON.parse(message.state));
-          break;
-        case "COMMIT":
-          connection.committedState = store.getState();
-          connection.connection.init(connection.committedState);
-          break;
-        default:
-          console.log(
-            "DISPATCH message not handled:",
-            message.payload.type,
-            message
-          );
+  const unsubscribe = connection?.connection?.subscribe?.((message: any) => {
+    try {
+      if (message.type === "START") {
+        console.log("here");
+        connection.connection.init(connection.initialState);
+      } else if (message.type === "DISPATCH") {
+        switch (message.payload?.type) {
+          case "RESET":
+            store.setState(connection.initialState);
+            break;
+          case "ROLLBACK":
+            store.setState(JSON.parse(message.state));
+            break;
+          case "JUMP_TO_ACTION":
+            store.setState(JSON.parse(message.state));
+            break;
+          case "COMMIT":
+            connection.committedState = store.getState();
+            connection.connection.init(connection.committedState);
+            break;
+          default:
+            console.log(
+              "DISPATCH message not handled:",
+              message.payload.type,
+              message
+            );
+        }
+      } else if (message.type === "ACTION") {
+        const messageAction = JSON.parse(message.payload);
+        store.dispatch(messageAction);
+      } else {
+        console.warn("message not handled:", message.type, message);
       }
-    } else if (message.type === "ACTION") {
-      const messageAction = JSON.parse(message.payload);
-      store.dispatch(messageAction);
-    } else {
-      console.log("message not handled:", message.type, message);
+    } catch (e) {
+      console.log(e);
     }
   });
 
   return () => {
-    connection.connection.unsubscribe();
-    store.offPreDataChanged(connection.preDataChangedListener);
-
-    delete connections[options.name];
+    unsubscribe();
+    store.offPreDataChanged(preDataChangedListener);
   };
 };
