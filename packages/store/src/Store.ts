@@ -20,7 +20,49 @@ interface StateAboutToChangeCallback<State, Action> {
   (newState: State, action: Action): void;
 }
 
-interface StoreConstructorProps<State, Action> {
+interface DefaultAction {
+  type: string;
+  [key: string]: any;
+}
+
+export interface UpdateFunction<Action = DefaultAction> {
+  (action: Action): void;
+}
+
+export interface HashingFunction<State> {
+  (input: State): string;
+}
+
+function isAsyncActionHandler(
+  actionHandler: ActionHandler<any, any>
+): actionHandler is AsyncActionHandler<any, any> {
+  return actionHandler.length >= 3;
+}
+
+function isSyncActionHandler(
+  actionHandler: ActionHandler<any, any>
+): actionHandler is SyncActionHandler<any, any> {
+  return actionHandler.length === 2;
+}
+
+interface AsyncActionHandler<State, Action> {
+  (
+    getState: () => State,
+    action: Action,
+    commit: (newState: State, cloneDeep?: boolean) => void,
+    dispatch?: (action: Action) => void
+  ): void;
+}
+
+interface SyncActionHandler<State, Action> {
+  (state: State, action: Action): State;
+}
+
+export type ActionHandler<State, Action> =
+  | SyncActionHandler<State, Action>
+  | AsyncActionHandler<State, Action>;
+
+interface ModelConstructorProps<State, Action> {
   initialState: State;
   actionHandlers: ActionHandler<State, Action>[];
   compareFunction?: (oldState: State, newState: State) => boolean;
