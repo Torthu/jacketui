@@ -248,23 +248,22 @@ export class Store<State extends object, Action extends BasicAction> {
    *   store.dispatch({ type: "TEST", payload: "new value" });
    */
   public dispatch(action: Action): void {
-    this._actionHandlers.forEach(
+    this.actionHandlers.forEach(
       (actionHandler: ActionHandler<State, Action>) => {
         if (isAsyncActionHandler(actionHandler)) {
+          // TODO: Do we want this feature?
           const commit = (newState: State, cloneDeep?: boolean) => {
-            this._broadcast.emit({
-              type: "preDataChanged",
-              payload: { state: newState, action },
-            });
+            this.preStateChangedCallbacks.forEach((callback) =>
+              callback(newState, action)
+            );
             this.setState(newState, cloneDeep);
           };
           actionHandler(this.getState, action, commit, this.dispatch);
         } else if (isSyncActionHandler(actionHandler)) {
           const newState = actionHandler(this.getState(), action);
-          this._broadcast.emit({
-            type: "preDataChanged",
-            payload: { state: newState, action },
-          });
+          this.preStateChangedCallbacks.forEach((callback) =>
+            callback(newState, action)
+          );
           this.setState(newState);
         }
       }
