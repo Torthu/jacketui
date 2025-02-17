@@ -1,4 +1,4 @@
-import Model, { ActionHandler } from "../src/Model";
+import { Store, ActionHandler } from "../src/Store";
 
 interface TestState {
   data: string;
@@ -17,9 +17,6 @@ interface AsyncUpdateDataAction {
 
 type TestAction = UpdateDataAction | AsyncUpdateDataAction;
 type TestActionHandler = ActionHandler<TestState, TestAction>;
-
-let n = 0;
-const hashingFunction = (anything: TestState) => "hello" + ++n;
 
 const handleUpdateData: TestActionHandler = (
   getState,
@@ -48,18 +45,17 @@ const handleAsyncUpdateDate: TestActionHandler = (getState, action, commit) => {
   }
 };
 
-const { update, getState, setState } = new Model<TestState, TestAction>({
-  hashingFunction: hashingFunction,
+const { dispatch, getState, setState } = new Store<TestState, TestAction>({
   initialState: { data: "", pending: [] },
   actionHandlers: [handleUpdateData, handleAsyncUpdateDate],
   onStateChanged: (getState) => console.log("NEW STATE", getState()),
 });
 
-update({ type: "UPDATE_ACTION", payload: "Hello World" });
+dispatch({ type: "UPDATE_ACTION", payload: "Hello World" });
 
 // Will only trigger once since we are "rate limiting" it within the state/handler
-update({ type: "ASYNC_UPDATE_ACTION", payload: "Other Data" });
-update({ type: "ASYNC_UPDATE_ACTION", payload: "Other Data" });
-update({ type: "ASYNC_UPDATE_ACTION", payload: "Other Data" });
-update({ type: "ASYNC_UPDATE_ACTION", payload: "Other Data" });
-update({ type: "ASYNC_UPDATE_ACTION", payload: "Other Data" });
+dispatch({ type: "ASYNC_UPDATE_ACTION", payload: "Other Data" });
+dispatch({ type: "ASYNC_UPDATE_ACTION", payload: "Other Data" });
+dispatch({ type: "ASYNC_UPDATE_ACTION", payload: "Other Data" });
+dispatch({ type: "ASYNC_UPDATE_ACTION", payload: "Other Data" });
+dispatch({ type: "ASYNC_UPDATE_ACTION", payload: "Other Data" });
