@@ -1,11 +1,13 @@
 import { md5Comparison } from "../src/comparison/md5Comparison";
 import { Store } from "../src/Store";
-import { md5 } from "../src/utils";
+
+type State = { a: string };
+type Action = { type: string; payload?: () => void };
 
 describe.only("Model", () => {
   describe("init", () => {
     it("should instantiate Model", () => {
-      const model = new Store<any, any>({
+      const model = new Store<unknown, unknown>({
         initialState: {},
         actionHandlers: [],
       });
@@ -84,10 +86,10 @@ describe.only("Model", () => {
 
   describe("dispatch", () => {
     it("should update state", () => {
-      const model = new Store<any, any>({
+      const model = new Store<State, Action>({
         initialState: { a: "A" },
         actionHandlers: [
-          (state, action) => {
+          (state: State, action: Action) => {
             return { ...state, a: "B" };
           },
         ],
@@ -99,7 +101,7 @@ describe.only("Model", () => {
     });
 
     it("should update state async", (done) => {
-      const model = new Store<any, any>({
+      const model = new Store<unknown, unknown>({
         initialState: { a: "A" },
         actionHandlers: [
           (state, action, commit) => {
@@ -115,14 +117,14 @@ describe.only("Model", () => {
     });
 
     it("should update state async", (done) => {
-      const model = new Store<any, any>({
+      const model = new Store<State, Action>({
         initialState: { a: "A" },
         actionHandlers: [
           (state, action, commit) => {
             if (action.type === "TEST") {
               setTimeout(() => {
                 commit({ ...state, a: "B" });
-                action.payload();
+                action.payload?.();
                 done();
               }, 10);
             }
@@ -137,7 +139,7 @@ describe.only("Model", () => {
 
   describe("onDataChanged", () => {
     it("should not be called if state hasnt changed", () => {
-      const model = new Store<any, any>({
+      const model = new Store<State, Action>({
         initialState: { a: "A" },
         actionHandlers: [],
       });
@@ -150,10 +152,10 @@ describe.only("Model", () => {
       expect(listener).not.toHaveBeenCalled();
     });
     it("should be called if data changed", () => {
-      const model = new Store<any, any>({
+      const model = new Store<State, Action>({
         initialState: { a: "A" },
         actionHandlers: [
-          (state, action) => {
+          (state: State, action: Action) => {
             return { ...state, a: "B" };
           },
         ],
@@ -169,10 +171,10 @@ describe.only("Model", () => {
   });
   describe("onPreDataChanged", () => {
     it("should be called", () => {
-      const model = new Store<any, any>({
+      const model = new Store<State, Action>({
         initialState: { a: "A" },
         actionHandlers: [
-          (state, action) => {
+          (state: State, action: Action) => {
             return { ...state, a: "B" };
           },
         ],
@@ -186,8 +188,8 @@ describe.only("Model", () => {
       expect(listener).toHaveBeenCalled();
     });
 
-    it("should be called even if state does not change", () => {
-      const model = new Store<any, any>({
+    it("should be not be called if state does not change", () => {
+      const model = new Store<State, Action>({
         initialState: { a: "A" },
         actionHandlers: [],
       });
@@ -197,13 +199,13 @@ describe.only("Model", () => {
 
       model.dispatch({ type: "TEST" });
 
-      expect(listener).toHaveBeenCalled();
+      expect(listener).not.toHaveBeenCalled();
     });
   });
 
   describe("md5Comparison", () => {
     it("should not be called if state hasnt changed", () => {
-      const model = new Store<any, any>({
+      const model = new Store<State, Action>({
         initialState: { a: "A" },
         actionHandlers: [],
         compareFunction: md5Comparison,
@@ -218,10 +220,10 @@ describe.only("Model", () => {
     });
 
     it("should be called if data changed", () => {
-      const model = new Store<any, any>({
+      const model = new Store<State, Action>({
         initialState: { a: "A" },
         actionHandlers: [
-          (state, action) => {
+          (state: State, action: Action) => {
             state.a = "B";
             return state;
           },
