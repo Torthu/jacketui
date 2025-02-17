@@ -3,14 +3,16 @@
   "private": "true",
   "version": "0.1.0",
   "description": "Simple Store implementation",
-  "main": "index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "directories": {
     "doc": "docs",
     "example": "examples",
     "test": "test"
   },
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "build": "rimraf ./dist && tsc"
   },
   "keywords": [
     "Store",

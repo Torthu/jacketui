@@ -4,6 +4,7 @@
     "packages/base",
     "packages/components",
     "packages/forms",
+    "packages/store",
     "packages/router",
     "packages/translate"
   ],
@@ -13,12 +14,14 @@
     "publish-components": "npm publish --workspace=packages/components",
     "publish-forms": "npm run build-forms && npm publish --workspace=packages/forms",
     "publish-router": "npm run build-router && npm publish --workspace=packages/router",
+    "publish-store": "npm run build-store && npm publish --workspace=packages/store",
     "publish-translate": "npm run build-translate && npm publish --workspace=packages/translate",
-    "build": "npm run build-base && npm run build-components && npm run build-forms && npm run build-translate",
+    "build": "npm run build-base && npm run build-components && npm run build-forms && npm run build-translate && npm run build-store && npm run build-router",
     "build-base": "npm run build --workspace=packages/base",
     "build-components": "npm run build --workspace=packages/components",
     "build-forms": "npm run build --workspace=packages/forms",
     "build-router": "npm run build --workspace=packages/router",
+    "build-store": "npm run build --workspace=packages/store",
     "build-translate": "npm run build --workspace=packages/translate",
     "link": "npm link --workspaces"
   },

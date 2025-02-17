@@ -1,6 +1,5 @@
 import { useRef, useState } from "react";
 import { Store, ActionHandler, UpdateFunction } from "./Store";
-import { md5 } from "./utils";
 
 /**
  *
@@ -8,7 +7,7 @@ import { md5 } from "./utils";
  * @param initialState
  * @returns [State, UpdateFunction<Action>, Store]
  */
-export default function useStore<State, Action>(
+export function useStore<State, Action>(
   actionHandlers: ActionHandler<State, Action>[],
   initialState: State
 ): [State, UpdateFunction<Action>, Store<State, Action>] {
