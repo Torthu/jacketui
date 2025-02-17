@@ -1,5 +1,23 @@
 import { Store } from "./Store";
-import * as ReduxDevTools from "@redux-devtools/extension";
+
+const defaultOptions = {
+  features: {
+    pause: true, // start/pause recording of dispatched actions
+    lock: true, // lock/unlock dispatching actions and side effects
+    export: true, // export history of actions in a file
+    import: "custom", // import history of actions from a file
+    jump: true, // jump back and forth (time travelling)
+
+    skip: true, // Cannot skip for we cannot replay.
+    reorder: true, // Cannot skip for we cannot replay.
+
+    persist: true, // Avoid trying persistence.
+    dispatch: true,
+    test: false, // Need custom test.
+  },
+};
+
+let connections: Record<string, any> = {};
 
 /** connectDevtools
  *  Connects a store to the Redux Devtools extension
@@ -13,32 +31,79 @@ import * as ReduxDevTools from "@redux-devtools/extension";
  *   store.update({ type: "INCREMENT" });
  */
 export const connectDevtools = (
-  store: Store<unknown, unknown>,
-  options: ReduxDevTools.Config = {}
+  store: Store<any, any>,
+  options = { name: "JacketUI-Store" }
 ) => {
-  const connection = (window as any).__REDUX_DEVTOOLS_EXTENSION__!.connect(
-    options
-  );
+  if (!connections[options.name]) {
+    let initialState = store.getState();
+    let committedState = store.getState();
 
-  connection.subscribe((message) => {
-    if (message.type === "DISPATCH" && message.state) {
-      store.setState(JSON.parse(message.state));
+    const devToolsConnection = (
+      window as any
+    ).__REDUX_DEVTOOLS_EXTENSION__.connect({
+      ...defaultOptions,
+      ...options,
+    });
+
+    console.log(options.name, connections);
+
+    const preDataChangedListener = store.onPreDataChanged((state, action) => {
+      try {
+        connection.connection.send(action, state);
+      } catch (e) {
+        console.log(e);
+      }
+    });
+
+    connections[options.name] = {
+      preDataChangedListener,
+      initialState,
+      committedState,
+      connection: devToolsConnection,
+    };
+  }
+
+  const connection = connections[options.name];
+
+  connection.connection.init(connection.initialState);
+
+  connection.connection.subscribe((message: any) => {
+    if (message.type === "START") {
+      connection.connection.init(connection.initialState);
+    } else if (message.type === "DISPATCH") {
+      switch (message.payload?.type) {
+        case "RESET":
+          store.setState(connection.initialState);
+          break;
+        case "ROLLBACK":
+          store.setState(JSON.parse(message.state));
+          break;
+        case "JUMP_TO_ACTION":
+          store.setState(JSON.parse(message.state));
+          break;
+        case "COMMIT":
+          connection.committedState = store.getState();
+          connection.connection.init(connection.committedState);
+          break;
+        default:
+          console.log(
+            "DISPATCH message not handled:",
+            message.payload.type,
+            message
+          );
+      }
+    } else if (message.type === "ACTION") {
+      const messageAction = JSON.parse(message.payload);
+      store.dispatch(messageAction);
+    } else {
+      console.log("message not handled:", message.type, message);
     }
   });
 
-  connection.init(store.getState());
-
-  const preDataChangedListener = store.onPreDataChanged((state, action) => {
-    connection.send(action, state);
-  });
-
-  const dataChangedListener = store.onDataChanged(() => {
-    connection.send(store.getState());
-  });
-
   return () => {
-    connection.unsubscribe();
-    store.offPreDataChanged(preDataChangedListener);
-    store.offDataChanged(dataChangedListener);
+    connection.connection.unsubscribe();
+    store.offPreDataChanged(connection.preDataChangedListener);
+
+    delete connections[options.name];
   };
 };
