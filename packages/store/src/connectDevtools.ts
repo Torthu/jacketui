@@ -3,15 +3,15 @@ import { Store } from "./Store";
 const defaultOptions = {
   features: {
     pause: true, // start/pause recording of dispatched actions
-    lock: true, // lock/unlock dispatching actions and side effects
-    export: true, // export history of actions in a file
-    import: "custom", // import history of actions from a file
+    lock: false, // lock/unlock dispatching actions and side effects
+    export: false, // export history of actions in a file
+    import: false, //"custom", // import history of actions from a file
     jump: true, // jump back and forth (time travelling)
 
-    skip: true, // Cannot skip for we cannot replay.
-    reorder: true, // Cannot skip for we cannot replay.
+    skip: false, // Cannot skip for we cannot replay.
+    reorder: false, // Cannot skip for we cannot replay.
 
-    persist: true, // Avoid trying persistence.
+    persist: false, // Avoid trying persistence.
     dispatch: true,
     test: false, // Need custom test.
   },
@@ -67,7 +67,6 @@ export const connectDevtools = (
   const unsubscribe = connection?.connection?.subscribe?.((message: any) => {
     try {
       if (message.type === "START") {
-        console.log("here");
         connection.connection.init(connection.initialState);
       } else if (message.type === "DISPATCH") {
         switch (message.payload?.type) {
