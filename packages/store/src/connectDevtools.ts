@@ -3,15 +3,15 @@ import { Store } from "./Store";
 const defaultOptions = {
   features: {
     pause: true, // start/pause recording of dispatched actions
-    lock: false, // lock/unlock dispatching actions and side effects
-    export: false, // export history of actions in a file
-    import: false, //"custom", // import history of actions from a file
+    lock: true, // lock/unlock dispatching actions and side effects
+    export: true, // export history of actions in a file
+    import: "custom", // import history of actions from a file
     jump: true, // jump back and forth (time travelling)
 
-    skip: false, // Cannot skip for we cannot replay.
-    reorder: false, // Cannot skip for we cannot replay.
+    skip: true, // Cannot skip for we cannot replay.
+    reorder: true, // Cannot skip for we cannot replay.
 
-    persist: false, // Avoid trying persistence.
+    persist: true, // Avoid trying persistence.
     dispatch: true,
     test: false, // Need custom test.
   },
@@ -45,9 +45,18 @@ export const connectDevtools = (
       ...options,
     });
 
-    devToolsConnection.init(initialState);
+    console.log(options.name, connections);
+
+    const preDataChangedListener = store.onPreDataChanged((state, action) => {
+      try {
+        connection.connection.send(action, state);
+      } catch (e) {
+        console.log(e);
+      }
+    });
 
     connections[options.name] = {
+      preDataChangedListener,
       initialState,
       committedState,
       connection: devToolsConnection,
@@ -56,53 +65,45 @@ export const connectDevtools = (
 
   const connection = connections[options.name];
 
-  const preDataChangedListener = store.onPreDataChanged((state, action) => {
-    try {
-      connection.connection.send(action, state);
-    } catch (e) {
-      console.log(e);
-    }
-  });
+  connection.connection.init(connection.initialState);
 
-  const unsubscribe = connection?.connection?.subscribe?.((message: any) => {
-    try {
-      if (message.type === "START") {
-        connection.connection.init(connection.initialState);
-      } else if (message.type === "DISPATCH") {
-        switch (message.payload?.type) {
-          case "RESET":
-            store.setState(connection.initialState);
-            break;
-          case "ROLLBACK":
-            store.setState(JSON.parse(message.state));
-            break;
-          case "JUMP_TO_ACTION":
-            store.setState(JSON.parse(message.state));
-            break;
-          case "COMMIT":
-            connection.committedState = store.getState();
-            connection.connection.init(connection.committedState);
-            break;
-          default:
-            console.log(
-              "DISPATCH message not handled:",
-              message.payload.type,
-              message
-            );
-        }
-      } else if (message.type === "ACTION") {
-        const messageAction = JSON.parse(message.payload);
-        store.dispatch(messageAction);
-      } else {
-        console.warn("message not handled:", message.type, message);
+  connection.connection.subscribe((message: any) => {
+    if (message.type === "START") {
+      connection.connection.init(connection.initialState);
+    } else if (message.type === "DISPATCH") {
+      switch (message.payload?.type) {
+        case "RESET":
+          store.setState(connection.initialState);
+          break;
+        case "ROLLBACK":
+          store.setState(JSON.parse(message.state));
+          break;
+        case "JUMP_TO_ACTION":
+          store.setState(JSON.parse(message.state));
+          break;
+        case "COMMIT":
+          connection.committedState = store.getState();
+          connection.connection.init(connection.committedState);
+          break;
+        default:
+          console.log(
+            "DISPATCH message not handled:",
+            message.payload.type,
+            message
+          );
       }
-    } catch (e) {
-      console.log(e);
+    } else if (message.type === "ACTION") {
+      const messageAction = JSON.parse(message.payload);
+      store.dispatch(messageAction);
+    } else {
+      console.log("message not handled:", message.type, message);
     }
   });
 
   return () => {
-    unsubscribe();
-    store.offPreDataChanged(preDataChangedListener);
+    connection.connection.unsubscribe();
+    store.offPreDataChanged(connection.preDataChangedListener);
+
+    delete connections[options.name];
   };
 };
