@@ -11,8 +11,7 @@
   },
   "scripts": {
     "test": "jest",
-    "build": "rimraf ./dist && tsc",
-    "prepublish": "npm run test && npm run build"
+    "build": "rimraf ./dist && tsc"
   },
   "keywords": [
     "Store",
