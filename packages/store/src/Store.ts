@@ -24,7 +24,7 @@ export interface HashingFunction<State> {
 function isAsyncActionHandler(
   actionHandler: ActionHandler<any, any>
 ): actionHandler is AsyncActionHandler<any, any> {
-  return actionHandler.length === 3;
+  return actionHandler.length >= 3;
 }
 
 function isSyncActionHandler(
@@ -37,7 +37,8 @@ interface AsyncActionHandler<State, Action> {
   (
     getState: () => State,
     action: Action,
-    commit: (newState: State, cloneDeep?: boolean) => void
+    commit: (newState: State, cloneDeep?: boolean) => void,
+    dispatch?: (action: Action) => void
   ): void;
 }
 
