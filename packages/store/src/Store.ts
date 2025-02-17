@@ -227,16 +227,23 @@ export class Store<State, Action> {
    * @param action
    */
   public dispatch(action: Action): void {
-    this.preStateChangedCallbacks.forEach((callback) =>
-      callback(this.getState(), action)
-    );
     this.actionHandlers.forEach(
       (actionHandler: ActionHandler<State, Action>) => {
         if (isAsyncActionHandler(actionHandler)) {
           // TODO: Do we want this feature?
-          actionHandler(this.getState, action, this.setState);
+          const commit = (newState: State, cloneDeep?: boolean) => {
+            this.preStateChangedCallbacks.forEach((callback) =>
+              callback(newState, action)
+            );
+            this.setState(newState, cloneDeep);
+          };
+          actionHandler(this.getState, action, commit, this.dispatch);
         } else if (isSyncActionHandler(actionHandler)) {
-          this.setState(actionHandler(this.getState(), action));
+          const newState = actionHandler(this.getState(), action);
+          this.preStateChangedCallbacks.forEach((callback) =>
+            callback(newState, action)
+          );
+          this.setState(newState);
         }
       }
     );
