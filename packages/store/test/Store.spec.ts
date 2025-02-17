@@ -4,10 +4,13 @@ import { Store } from "../src/Store";
 type State = { a: string };
 type Action = { type: string; payload?: () => void };
 
+type State = { a: string };
+type Action = { type: string; payload?: () => void };
+
 describe("Store", () => {
   describe("init", () => {
     it("should instantiate Model", () => {
-      const store = new Store<{}, Action>({
+      const model = new Store<unknown, unknown>({
         initialState: {},
         actionHandlers: [],
       });
@@ -101,7 +104,7 @@ describe("Store", () => {
     });
 
     it("should update state async", (done) => {
-      const model = new Store<{}, Action>({
+      const model = new Store<unknown, unknown>({
         initialState: { a: "A" },
         actionHandlers: [
           (state, action, commit) => {
