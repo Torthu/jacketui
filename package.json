@@ -2,6 +2,7 @@
   "name": "@torthu/jacketui",
   "workspaces": [
     "packages/base",
+    "packages/broadcast",
     "packages/components",
     "packages/forms",
     "packages/store",
@@ -9,20 +10,23 @@
     "packages/translate"
   ],
   "scripts": {
-    "publish": "npm run build && npm publish --workspaces",
-    "publish-base": "npm run build-base && npm publish --workspace=packages/base --access public",
-    "publish-components": "npm publish --workspace=packages/components",
-    "publish-forms": "npm run build-forms && npm publish --workspace=packages/forms",
-    "publish-router": "npm run build-router && npm publish --workspace=packages/router",
-    "publish-store": "npm run build-store && npm publish --workspace=packages/store",
-    "publish-translate": "npm run build-translate && npm publish --workspace=packages/translate",
     "build": "npm run build-base && npm run build-components && npm run build-forms && npm run build-translate && npm run build-store && npm run build-router",
     "build-base": "npm run build --workspace=packages/base",
+    "build-broadcast": "npm run build --workspace=packages/broadcast",
     "build-components": "npm run build --workspace=packages/components",
     "build-forms": "npm run build --workspace=packages/forms",
     "build-router": "npm run build --workspace=packages/router",
     "build-store": "npm run build --workspace=packages/store",
     "build-translate": "npm run build --workspace=packages/translate",
+    "publish": "npm run build && npm publish --workspaces",
+    "publish-base": "npm run build-base && npm publish --workspace=packages/base",
+    "publish-broadcast": "npm run build-broadcast && npm publish --workspace=packages/broadcast",
+    "publish-components": "npm publish --workspace=packages/components",
+    "publish-forms": "npm run build-forms && npm publish --workspace=packages/forms",
+    "publish-router": "npm run build-router && npm publish --workspace=packages/router",
+    "publish-store": "npm run build-store && npm publish --workspace=packages/store",
+    "publish-translate": "npm run build-translate && npm publish --workspace=packages/translate",
+    "test": "npm run test --workspaces",
     "link": "npm link --workspaces"
   },
   "devDependencies": {
