@@ -24,6 +24,9 @@
     "url": "https://thune.io"
   },
   "license": "GPL-3.0-only",
+  "dependencies": {
+    "@torthu/jacketui-broadcast": "^0.1.0"
+  },
   "devDependencies": {
     "@types/jest": "^29.5.14",
     "@types/react": "19.0.9",
