@@ -1,29 +1,35 @@
-// Super simple Event class modeled after DOM Events
-export class BroadcastEvent<T extends string = string> {
-  // A reference to the currently registered target for the event. This is the object to which the event is currently slated to be sent; it's possible this has been changed along the way through retargeting.
+import { BroadcastAction } from "./types/BroadcastAction";
 
-  // Indicates whether or not event.preventDefault() has been called on the event.
+/** BroadcastEvent
+ *  Super simple Event class modeled after DOM Events and Store Actions.
+ */
+export class BroadcastEvent<A extends BroadcastAction> {
+  /** Event type, i.e on("eventType") => type: "eventType" */
+  type: A["type"];
+
+  /** Unix timestamp */
+  timeStamp: number;
+
+  /** The emitted action */
+  action: A;
+
+  /** Emitted Action, stored in param to keep compatibility with DOM events */
+  param: A;
+
+  /** Indicates whether or not event.preventDefault() has been called on the event. */
   public defaultPrevented: boolean = false;
 
+  /** In a bubbling scenario indicates whether it should stop propagating */
   public propagationStopped: boolean = false;
 
-  // The time at which the event was created (in milliseconds)
-  public timeStamp: number;
-
-  // The name of the event
-  public type: T;
-
-  // The event payload
-  public param: any = undefined;
-
-  // whether immediate propagations has been stopped
+  /** Indicates whether nodes in the same branch of a "bubbling" tree should be notified */
   public immediatePropagationStopped: boolean = false;
 
-  constructor(type: T, param: any) {
-    this.type = type;
+  constructor(action: A) {
+    this.type = action.type;
+    this.action = action;
+    this.param = action;
     this.timeStamp = Date.now();
-    this.param = param;
-    this.defaultPrevented = false;
   }
 
   // Prevent default behaviour for the event, meaning any listener in core

@@ -1,33 +1,22 @@
 import { BroadcastEvent } from "./BroadcastEvent";
+import { BroadcastAction } from "./types/BroadcastAction";
 
-export interface BroadcastInterface<T extends string = string> {
-  emit: (eventName: T, payload: any) => void;
-  on: (
-    eventName: T,
-    callback: BroadcastCallbackFunction
-  ) => BroadcastCallbackFunction;
-  off: (eventName: T, callback: BroadcastCallbackFunction) => boolean;
-  offAll: (eventName: T) => boolean;
-  once: (
-    eventName: T,
-    callback: BroadcastCallbackFunction
-  ) => BroadcastCallbackFunction;
-}
+export type BroadcastCallbackFunction<A extends BroadcastAction> = (
+  e: BroadcastEvent<A>
+) => void;
 
-export type BroadcastCallbackFunction = (e: BroadcastEvent) => void;
+export class Broadcast<A extends BroadcastAction = BroadcastAction> {
+  private listeners: Record<A["type"], BroadcastCallbackFunction<A>[]> =
+    {} as Record<A["type"], BroadcastCallbackFunction<A>[]>;
 
-export class Broadcast<T extends string = string>
-  implements BroadcastInterface<T>
-{
-  private listeners: Record<string, BroadcastCallbackFunction[]> = {};
-  public emit<T extends string>(key: T, payload: any): BroadcastEvent {
-    const event = new BroadcastEvent(key, payload);
+  public emit(action: A): BroadcastEvent<A> {
+    const event = new BroadcastEvent<A>(action);
 
-    this.notify(key, event);
+    this.notify(action.type, event);
     return event;
   }
 
-  private notify(key: string, event: BroadcastEvent): void {
+  private notify(key: A["type"], event: BroadcastEvent<A>): void {
     if (
       event.immediatePropagationStopped !== true &&
       this.listeners?.[key]?.length > 0
@@ -42,9 +31,9 @@ export class Broadcast<T extends string = string>
 
   // Listen to events hitting this module
   public on(
-    key: T,
-    callback: BroadcastCallbackFunction
-  ): BroadcastCallbackFunction {
+    key: A["type"],
+    callback: BroadcastCallbackFunction<A>
+  ): BroadcastCallbackFunction<A> {
     if (typeof key === "string") {
       if (this.listeners[key] === undefined) {
         this.listeners[key] = [];
@@ -57,7 +46,7 @@ export class Broadcast<T extends string = string>
   }
 
   // Remove all event listeners of type
-  public offAll(key: T): boolean {
+  public offAll(key: A["type"]): boolean {
     if (typeof key === "string") {
       delete this.listeners[key];
       return true;
@@ -66,7 +55,7 @@ export class Broadcast<T extends string = string>
   }
 
   // Remote a event listener
-  public off(key: T, callback: BroadcastCallbackFunction): boolean {
+  public off(key: A["type"], callback: BroadcastCallbackFunction<A>): boolean {
     if (typeof key === "string") {
       const index = this.listeners[key]?.indexOf(callback);
 
@@ -80,10 +69,10 @@ export class Broadcast<T extends string = string>
 
   // Listen to an event hitting this module. Triggers only once.
   public once(
-    key: T,
-    callback: BroadcastCallbackFunction
-  ): BroadcastCallbackFunction {
-    const cb: BroadcastCallbackFunction = (e) => {
+    key: A["type"],
+    callback: BroadcastCallbackFunction<A>
+  ): BroadcastCallbackFunction<A> {
+    const cb: BroadcastCallbackFunction<A> = (e) => {
       this.off(key, cb);
       callback(e);
     };
