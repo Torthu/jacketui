@@ -26,8 +26,9 @@ import { Translate } from "../src";
 // const englishHello = t("hello", { person: "Bob" }); // => Hello Bob
 // console.log(englishHello);
 
-let translateInstance;
-let t;
+let translateInstance: Translate;
+let t: Translate["t"];
+
 describe.only("Translate", () => {
   beforeAll(() => {
     translateInstance = new Translate();
