@@ -4,15 +4,15 @@ import { Store } from "../src/Store";
 type State = { a: string };
 type Action = { type: string; payload?: () => void };
 
-describe.only("Model", () => {
+describe("Store", () => {
   describe("init", () => {
     it("should instantiate Model", () => {
-      const model = new Store<unknown, unknown>({
+      const store = new Store<{}, Action>({
         initialState: {},
         actionHandlers: [],
       });
 
-      expect(model).toBeInstanceOf(Store);
+      expect(store).toBeInstanceOf(Store);
     });
   });
 
@@ -101,7 +101,7 @@ describe.only("Model", () => {
     });
 
     it("should update state async", (done) => {
-      const model = new Store<unknown, unknown>({
+      const model = new Store<{}, Action>({
         initialState: { a: "A" },
         actionHandlers: [
           (state, action, commit) => {
@@ -137,6 +137,31 @@ describe.only("Model", () => {
     });
   });
 
+  describe("state", () => {
+    it("should return state", () => {
+      const model = new Store<State, Action>({
+        initialState: { a: "A" },
+        actionHandlers: [],
+      });
+
+      expect(model.getState()).toEqual({ a: "A" });
+    });
+
+    it("setState() should trigger onDataChanged", () => {
+      const model = new Store<State, Action>({
+        initialState: { a: "A" },
+        actionHandlers: [],
+      });
+
+      const listener = jest.fn();
+      model.onDataChanged(listener);
+
+      model.setState({ a: "B" });
+
+      expect(listener).toHaveBeenCalled();
+    });
+  });
+
   describe("onDataChanged", () => {
     it("should not be called if state hasnt changed", () => {
       const model = new Store<State, Action>({
@@ -151,6 +176,7 @@ describe.only("Model", () => {
 
       expect(listener).not.toHaveBeenCalled();
     });
+
     it("should be called if data changed", () => {
       const model = new Store<State, Action>({
         initialState: { a: "A" },
@@ -169,6 +195,7 @@ describe.only("Model", () => {
       expect(listener).toHaveBeenCalled();
     });
   });
+
   describe("onPreDataChanged", () => {
     it("should be called", () => {
       const model = new Store<State, Action>({

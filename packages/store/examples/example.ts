@@ -1,34 +1,36 @@
-import { Store, ActionHandler } from "../src/Store";
+import { Store, ActionHandler } from "../";
 
 interface TestState {
   data: string;
   pending: string[];
 }
 
-interface UpdateDataAction {
-  type: "UPDATE_ACTION";
-  payload: string;
-}
+type TestAction =
+  | {
+      type: "UPDATE_ACTION";
+      payload: string;
+    }
+  | {
+      type: "ASYNC_UPDATE_ACTION";
+      payload: string;
+    };
 
-interface AsyncUpdateDataAction {
-  type: "ASYNC_UPDATE_ACTION";
-  payload: string;
-}
-
-type TestAction = UpdateDataAction | AsyncUpdateDataAction;
 type TestActionHandler = ActionHandler<TestState, TestAction>;
 
-const handleUpdateData: TestActionHandler = (
-  getState,
-  action: TestAction,
-  commit
-) => {
+/**
+ * Illustrates a sync action handler
+ * This works exactly like the reducer in e.g React useReducer
+ */
+const handleUpdateData: TestActionHandler = (state, action) => {
   if (action.type === "UPDATE_ACTION") {
-    const state = getState();
-    commit({ ...state, data: action.payload });
+    return { ...state, data: action.payload };
   }
 };
 
+/**
+ * Illustrates an async action handler
+ * This one also illustrates a "rate limiting" pattern
+ */
 const handleAsyncUpdateDate: TestActionHandler = (getState, action, commit) => {
   const state = getState();
   if (
@@ -45,6 +47,9 @@ const handleAsyncUpdateDate: TestActionHandler = (getState, action, commit) => {
   }
 };
 
+/**
+ * Initialze the store with the two action handlers defined above
+ */
 const { dispatch, getState, setState } = new Store<TestState, TestAction>({
   initialState: { data: "", pending: [] },
   actionHandlers: [handleUpdateData, handleAsyncUpdateDate],

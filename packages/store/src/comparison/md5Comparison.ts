@@ -1,8 +1,9 @@
 import { md5 } from "../utils";
 import { hashComparison } from "./hashComparison";
 
-/**
- * Simple reference equality comparison
+/** md5Comparison(oldState, newState)
+ *  Calculates hash of oldState and newState using md5 and compares them for equality
+ *
  * @param {State} oldState
  * @param {State} newState
  * @returns {boolean} is equal
