@@ -20,7 +20,8 @@
   },
   "scripts": {
     "prepublish": "npm run build",
-    "build": "rimraf ./dist && tsc"
+    "build": "rimraf ./dist && tsc",
+    "test": "exit 0"
   },
   "license": "GPL-3.0-only"
 }
