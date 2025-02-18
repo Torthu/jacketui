@@ -10,15 +10,14 @@
     "url": "https://thune.io"
   },
   "peerDependencies": {
-    "react": "*",
-    "tailwind-merge": "*"
+    "react": "*"
   },
   "dependencies": {
     "regexparam": "^3.0.0"
   },
   "devDependencies": {
     "@types/react": "^19.0.3",
-    "react": "18.2.0",
+    "react": "19.0.0",
     "tailwind-merge": "latest"
   },
   "scripts": {
