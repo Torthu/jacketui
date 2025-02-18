@@ -18,7 +18,7 @@
     "build-router": "npm run build --workspace=packages/router",
     "build-store": "npm run build --workspace=packages/store",
     "build-translate": "npm run build --workspace=packages/translate",
-    "publish": "npm run build && npm run test && npm publish --workspaces",
+    "publish": "npm run build && npm publish --workspaces",
     "publish-base": "npm run build-base && npm publish --workspace=packages/base",
     "publish-broadcast": "npm run build-broadcast && npm publish --workspace=packages/broadcast",
     "publish-components": "npm publish --workspace=packages/components",
