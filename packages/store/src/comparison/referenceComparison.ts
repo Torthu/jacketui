@@ -1,5 +1,6 @@
-/**
- * Simple reference equality comparison
+/** referenceComparison(oldState, newState)
+ * Simple reference equality comparison.
+ * This is the default comparison function.
  * @param {State} oldState
  * @param {State} newState
  * @returns {boolean} is equal
