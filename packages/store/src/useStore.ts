@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
-import { Store, ActionHandler, UpdateFunction } from "./Store";
+import { Store } from "./Store";
+import { BasicAction, ActionHandler, Dispatch } from "./types";
 
 /** useStore(actionHandlers, initialState)
  *  Hook for using a Store.
@@ -8,7 +9,7 @@ import { Store, ActionHandler, UpdateFunction } from "./Store";
  * @param {State} initialState
  * @returns [State, Dispatch<Action>, Store]
  */
-export function useStore<State, Action>(
+export function useStore<State extends object, Action extends BasicAction>(
   actionHandlers: ActionHandler<State, Action>[],
   initialState: State
 ): [State, Dispatch<Action>, Store<State, Action>] {
