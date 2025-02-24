@@ -3,6 +3,7 @@ import { TimeoutError } from "./errors/TimeoutError";
 import { md5 } from "./md5";
 import { FetchOptions } from "./types/FetchOptions";
 import { InFlight } from "./types/InFlight";
+import { Middleware } from "./types/Middleware";
 import { withResolvers } from "./withResolvers";
 
 export class HttpClient {
@@ -15,6 +16,8 @@ export class HttpClient {
   public static wasTimeout = (error: unknown): error is TimeoutError => {
     return error instanceof TimeoutError;
   };
+
+  private middleware: Middleware[] = [];
 
   constructor() {
     this.fetch = this.fetch.bind(this);
