@@ -1,5 +1,5 @@
 export class TimeoutError extends Error {
-  constructor(message) {
+  constructor(message: string) {
     super(message);
     this.name = "TimeoutError";
   }

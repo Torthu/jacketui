@@ -147,7 +147,7 @@ export class HttpClient {
    *   const promise = httpClient.fetch("https://api.example.com");
    *   httpClient.abort(promise);
    */
-  public abort(promise: Promise<any> | string, reason?): void {
+  public abort(promise: Promise<any> | string, reason?: any): void {
     this.getInFlight(promise)?.controller.abort(reason);
   }
 
@@ -165,8 +165,8 @@ export class HttpClient {
   }
 
   private _doFetch(
-    request,
-    hash,
+    request: string | URL | Request,
+    hash: string,
     timeout = 0
   ): [Promise<Response>, AbortController] {
     const controller = new AbortController();
@@ -260,20 +260,14 @@ export class HttpClient {
       }
 
       if (inFlight.retry <= 0) {
-        console.log("Fetch error no more retry", error, {
-          wasAborted,
-          wasTimeout,
-        });
-
         inFlight.promises.forEach((p) => {
           p.reject(error);
           p.onError?.(error);
-          if (wasAborted) {
+          if (wasAborted && !wasTimeout) {
             console.log("CALL ONABORT", !!p.onAbort);
             p.onAbort?.(error);
           }
           if (wasTimeout) {
-            console.log("CALL ONTIMEOUT", !!p.onTimeout);
             p.onTimeout?.();
           }
         });
