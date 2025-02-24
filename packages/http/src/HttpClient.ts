@@ -1,6 +1,7 @@
 import { AbortError } from "./errors/AbortError";
 import { TimeoutError } from "./errors/TimeoutError";
 import { md5 } from "./md5";
+import { FetchOptions } from "./types/FetchOptions";
 import { InFlight } from "./types/InFlight";
 import { withResolvers } from "./withResolvers";
 
@@ -62,15 +63,7 @@ export class HttpClient {
       onTimeout,
       retry = 0,
       timeout = 0,
-    }: {
-      onSuccess?: (response: unknown) => void;
-      onError?: (reason?: any) => void;
-      onAbort?: (reason?: any) => void;
-      onRetry?: (retry: number, reason?: any) => void;
-      onTimeout?: () => void;
-      retry?: number;
-      timeout?: number;
-    } = {}
+    }: FetchOptions = {}
   ): Promise<Response> {
     const hash = md5(request);
     let inFlight = this.getInFlight(hash);
