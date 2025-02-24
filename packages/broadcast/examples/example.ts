@@ -1,4 +1,4 @@
-import { Broadcast, BroadcastEvent } from "../";
+import { Broadcast, BroadcastEvent } from "../src";
 
 type Action = { type: "someEventKey" | "triggerOnce"; data?: any };
 const broadcast = new Broadcast<Action>();
