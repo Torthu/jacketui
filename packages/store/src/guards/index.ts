@@ -1,2 +1,3 @@
-export * from "./isAsyncActionHandler";
-export * from "./isSyncActionHandler";
+export * from "./isAsyncReducer";
+export * from "./isEffect";
+export * from "./isReducer";

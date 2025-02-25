@@ -1,16 +1,15 @@
 import {
   Broadcast,
   BroadcastCallbackFunction,
+  BroadcastEvent,
 } from "@torthu/jacketui-broadcast";
 import { referenceComparison } from "./comparison/referenceComparison";
-import { isAsyncActionHandler, isSyncActionHandler } from "./guards";
+import { isAsyncReducer, isEffect, isReducer } from "./guards";
 import { ActionHandler } from "./types/ActionHandler";
 import { BasicAction } from "./types/BasicAction";
-import { OnPreDataChangedAction } from "./types/StoreBroadcastAction";
-import {
-  OnDataChangedAction,
-  StoreBroadcastAction,
-} from "./types/StoreBroadcastAction";
+import { StoreBroadcastAction } from "./types/StoreBroadcastAction";
+import { Effect } from "./types/Effect";
+import { Reducer } from "./types/Reducer";
 
 interface StateChangedCallback<State> {
   (getState: () => State): void;
@@ -20,7 +19,10 @@ interface StateAboutToChangeCallback<State, Action> {
   (newState: State, action: Action): void;
 }
 
-interface StoreConstructorProps<State, Action> {
+interface StoreConstructorProps<
+  State extends object,
+  Action extends BasicAction
+> {
   initialState: State;
   actionHandlers: ActionHandler<State, Action>[];
   compareFunction?: (oldState: State, newState: State) => boolean;
@@ -32,6 +34,7 @@ interface StoreConstructorProps<State, Action> {
  */
 export class Store<State extends object, Action extends BasicAction> {
   private _actionHandlers: ActionHandler<State, Action>[];
+
   private _state: State;
   private _broadcast: Broadcast<StoreBroadcastAction<State, Action>>;
 
@@ -121,6 +124,20 @@ export class Store<State extends object, Action extends BasicAction> {
     return this.setState(Object.assign({}, this.getState(), newState));
   }
 
+  public on(
+    action: StoreBroadcastAction<State, Action>["type"],
+    callback: BroadcastCallbackFunction<StoreBroadcastAction<State, Action>>
+  ) {
+    return this._broadcast.on(action, callback);
+  }
+
+  public off(
+    action: StoreBroadcastAction<State, Action>["type"],
+    callback: BroadcastCallbackFunction<StoreBroadcastAction<State, Action>>
+  ) {
+    return this._broadcast.off(action, callback);
+  }
+
   /** onPreDataChanged(callback)
    *  Listen to and manipulate actions before they are applied
    *  Triggered before the internal state changes
@@ -129,9 +146,9 @@ export class Store<State extends object, Action extends BasicAction> {
    * @return {StateAboutToChangeCallback<State>}
    */
   public onPreDataChanged(callback: StateAboutToChangeCallback<State, Action>) {
-    return this._broadcast.on("preDataChanged", (e) => {
-      if (e.action.type === "preDataChanged") {
-        callback(e.action.payload.state, e.action.payload.action);
+    return this._broadcast.on("preStateChange", (e) => {
+      if (e.action.type === "preStateChange") {
+        callback(e.action.payload.toState, e.action.payload.action);
       }
     });
   }
@@ -142,7 +159,7 @@ export class Store<State extends object, Action extends BasicAction> {
    * @param {StateAboutToChangeCallback<State>} callback
    */
   public offPreDataChanged(callback: BroadcastCallbackFunction<any>): void {
-    this._broadcast.off("preDataChanged", callback);
+    this._broadcast.off("preStateChange", callback);
   }
 
   /** onDataChanged(callback)
@@ -152,8 +169,8 @@ export class Store<State extends object, Action extends BasicAction> {
    * @return {StateChangedCallback<State>}
    */
   public onDataChanged(callback: StateChangedCallback<State>) {
-    return this._broadcast.on("dataChanged", (e) => {
-      if (e.action.type === "dataChanged") {
+    return this._broadcast.on("stateChanged", (e) => {
+      if (e.action.type === "stateChanged") {
         callback(this.getState);
       }
     });
@@ -165,7 +182,7 @@ export class Store<State extends object, Action extends BasicAction> {
    * @param callback StateChangedCallback<State>
    */
   public offDataChanged(callback: BroadcastCallbackFunction<any>): void {
-    this._broadcast.off("dataChanged", callback);
+    this._broadcast.off("stateChanged", callback);
   }
 
   /** getState()
@@ -191,7 +208,10 @@ export class Store<State extends object, Action extends BasicAction> {
   public setState(newState: State, cloneDeep: boolean = false): State {
     if (this._isNewState(newState)) {
       this._state = cloneDeep ? Store.cloneDeep(newState) : newState;
-      this._broadcast.emit({ type: "dataChanged" });
+      this._broadcast.emit({
+        type: "stateChanged",
+        payload: { state: this._state },
+      });
     }
 
     return this._state;
@@ -206,22 +226,50 @@ export class Store<State extends object, Action extends BasicAction> {
    *   store.dispatch({ type: "TEST", payload: "new value" });
    */
   public dispatch(action: Action): void {
+    this._broadcast.emit({
+      type: "dispatch",
+      payload: { state: this.getState(), action },
+    });
+
     this._actionHandlers.forEach(
       (actionHandler: ActionHandler<State, Action>) => {
-        if (isAsyncActionHandler(actionHandler)) {
+        if (isEffect(actionHandler)) {
+          actionHandler({
+            getState: this.getState,
+            action,
+            setState: (newState: State, cloneDeep?: boolean) => {
+              this._broadcast.emit({
+                type: "preStateChange",
+                payload: {
+                  fromState: this.getState(),
+                  toState: newState,
+                  action,
+                },
+              });
+              this.setState(newState, cloneDeep);
+            },
+            dispatch: this.dispatch,
+            on: this.on,
+            off: this.off,
+          });
+        } else if (isAsyncReducer(actionHandler)) {
           const commit = (newState: State, cloneDeep?: boolean) => {
             this._broadcast.emit({
-              type: "preDataChanged",
-              payload: { state: newState, action },
+              type: "preStateChange",
+              payload: {
+                fromState: this.getState(),
+                toState: newState,
+                action,
+              },
             });
             this.setState(newState, cloneDeep);
           };
-          actionHandler(this.getState, action, commit, this.dispatch);
-        } else if (isSyncActionHandler(actionHandler)) {
+          actionHandler(this.getState, action, commit);
+        } else if (isReducer(actionHandler)) {
           const newState = actionHandler(this.getState(), action);
           this._broadcast.emit({
-            type: "preDataChanged",
-            payload: { state: newState, action },
+            type: "preStateChange",
+            payload: { fromState: this.getState(), toState: newState, action },
           });
           this.setState(newState);
         }
@@ -248,14 +296,17 @@ export class Store<State extends object, Action extends BasicAction> {
     }
 
     this._compareFunction = props.compareFunction || referenceComparison;
+
     this._actionHandlers = props.actionHandlers;
+
+    // Set Initial State
+    this._state = props.initialState;
 
     // Bind Scope
     this.setState = this.setState.bind(this);
     this.getState = this.getState.bind(this);
     this.dispatch = this.dispatch.bind(this);
-
-    // Set Initial State
-    this._state = props.initialState;
+    this.on = this.on.bind(this);
+    this.off = this.off.bind(this);
   }
 }
