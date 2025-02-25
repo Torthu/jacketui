@@ -1,16 +1,9 @@
-export interface AsyncActionHandler<State, Action> {
-  (
-    getState: () => State,
-    action: Action,
-    commit: (newState: State, cloneDeep?: boolean) => void,
-    dispatch?: (action: Action) => void
-  ): void;
-}
+import { AsyncReducer } from "./AsyncReducer";
+import { BasicAction } from "./BasicAction";
+import { Effect } from "./Effect";
+import { Reducer } from "./Reducer";
 
-export interface SyncActionHandler<State, Action> {
-  (state: State, action: Action): State;
-}
-
-export type ActionHandler<State, Action> =
-  | SyncActionHandler<State, Action>
-  | AsyncActionHandler<State, Action>;
+export type ActionHandler<State extends object, Action extends BasicAction> =
+  | Reducer<State, Action>
+  | AsyncReducer<State, Action>
+  | Effect<State, Action>;

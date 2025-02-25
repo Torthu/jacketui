@@ -1,5 +1,14 @@
-import { md5Comparison } from "../src/comparison/md5Comparison";
-import { Store } from "../src/Store";
+import {
+  describe,
+  beforeEach,
+  afterEach,
+  test,
+  it,
+  vi,
+  expect,
+  Mock,
+} from "vitest";
+import { Store, md5Comparison } from "../src";
 
 type State = { a: string };
 type Action = { type: string; payload?: () => void };
@@ -100,13 +109,12 @@ describe("Store", () => {
       expect(model.getState()).toEqual({ a: "B" });
     });
 
-    it("should update state async", (done) => {
+    it("should update state async", () => {
       const model = new Store<{}, Action>({
         initialState: { a: "A" },
         actionHandlers: [
           (state, action, commit) => {
             commit({ ...state, a: "B" });
-            done();
           },
         ],
       });
@@ -116,7 +124,7 @@ describe("Store", () => {
       expect(model.getState()).toEqual({ a: "B" });
     });
 
-    it("should update state async", (done) => {
+    it("should update state async", () => {
       const model = new Store<State, Action>({
         initialState: { a: "A" },
         actionHandlers: [
@@ -125,7 +133,6 @@ describe("Store", () => {
               setTimeout(() => {
                 commit({ ...state, a: "B" });
                 action.payload?.();
-                done();
               }, 10);
             }
           },
@@ -153,7 +160,7 @@ describe("Store", () => {
         actionHandlers: [],
       });
 
-      const listener = jest.fn();
+      const listener = vi.fn();
       model.onDataChanged(listener);
 
       model.setState({ a: "B" });
@@ -169,7 +176,7 @@ describe("Store", () => {
         actionHandlers: [],
       });
 
-      const listener = jest.fn();
+      const listener = vi.fn();
       model.onDataChanged(listener);
 
       model.dispatch({ type: "TEST" });
@@ -187,7 +194,7 @@ describe("Store", () => {
         ],
       });
 
-      const listener = jest.fn();
+      const listener = vi.fn();
       model.onDataChanged(listener);
 
       model.dispatch({ type: "TEST" });
@@ -207,7 +214,7 @@ describe("Store", () => {
         ],
       });
 
-      const listener = jest.fn();
+      const listener = vi.fn();
       model.onPreDataChanged(listener);
 
       model.dispatch({ type: "TEST" });
@@ -221,7 +228,7 @@ describe("Store", () => {
         actionHandlers: [],
       });
 
-      const listener = jest.fn();
+      const listener = vi.fn();
       model.onPreDataChanged(listener);
 
       model.dispatch({ type: "TEST" });
@@ -238,7 +245,7 @@ describe("Store", () => {
         compareFunction: md5Comparison,
       });
 
-      const listener = jest.fn();
+      const listener = vi.fn();
       model.onDataChanged(listener);
 
       model.dispatch({ type: "TEST" });
@@ -258,7 +265,7 @@ describe("Store", () => {
         compareFunction: md5Comparison,
       });
 
-      const listener = jest.fn();
+      const listener = vi.fn();
       model.onDataChanged(listener);
 
       model.dispatch({ type: "TEST" });
