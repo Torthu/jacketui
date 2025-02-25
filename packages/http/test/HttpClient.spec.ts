@@ -1,3 +1,4 @@
+import { AbortError } from "../src/errors";
 import { abort, HttpClient } from "../src/HttpClient";
 import { withResolvers } from "../src/withResolvers";
 import {
@@ -68,21 +69,34 @@ describe("HttpClient", () => {
     expect(json).toEqual({ test: 100 });
   });
 
-  it("should abort", () => {
-    new Promise<void>((done) => {
-      const cb = vi.fn();
-      const errcb = vi.fn();
-      const client = new HttpClient();
-      const promise = client.fetch("withTimeout");
-      promise.then(cb).catch(errcb);
-      client.abort(promise);
+  it("should abort", async () => {
+    const cb = vi.fn();
+    const errcb = vi.fn();
+    const abortcb = vi.fn();
 
-      setTimeout(() => {
-        expect(cb).not.toHaveBeenCalled();
-        expect(errcb).toHaveBeenCalled();
-        done();
-      }, 3);
+    const client = new HttpClient();
+    let res;
+    let err;
+
+    const promise = client.fetch("withTimeout", {
+      onSuccess: cb,
+      onError: errcb,
+      onAbort: abortcb,
     });
+
+    client.abort(promise);
+
+    try {
+      res = await promise;
+    } catch (e) {
+      err = e;
+    }
+
+    expect(cb).not.toHaveBeenCalled();
+    expect(errcb).toHaveBeenCalled();
+    expect(abortcb).toHaveBeenCalled();
+    expect(res).toBeUndefined();
+    expect(err).toBeInstanceOf(AbortError);
   });
 
   it("should getInFlight", () => {
@@ -115,75 +129,81 @@ describe("HttpClient", () => {
     expect(inFlight1).not.toBe(inFlight2);
   });
 
-  it("should retry", () => {
-    new Promise<void>((done) => {
-      const retryCb = vi.fn();
-      const retries = 5;
-      const cb = vi.fn();
-      const errcb = vi.fn();
+  it("should retry", async () => {
+    const retryCb = vi.fn();
+    const retries = 5;
+    const cb = vi.fn();
+    const errcb = vi.fn();
 
-      const client = new HttpClient();
+    const client = new HttpClient();
 
-      client
-        .fetch("err", { onRetry: retryCb, retry: retries })
-        .then(cb)
-        .catch(errcb);
+    let res;
+    let err;
 
-      setTimeout(() => {
-        expect(retryCb).toHaveBeenCalledTimes(5);
-        expect(cb).not.toHaveBeenCalled();
-        expect(errcb).toHaveBeenCalledTimes(1);
-        done();
-      }, retries * 2 + 1);
-    });
+    try {
+      res = await client.fetch("err", {
+        onRetry: retryCb,
+        retry: retries,
+        onSuccess: cb,
+        onError: errcb,
+      });
+    } catch (error) {
+      err = error;
+    }
+
+    expect(res).toBeUndefined();
+    expect(err).toBeDefined();
+    expect(cb).not.toHaveBeenCalled();
+    expect(errcb).toHaveBeenCalled();
+    expect(retryCb).toHaveBeenCalledTimes(5);
   });
 
-  it.only("should timeout", () => {
-    return new Promise<void>((done) => {
-      vi.useFakeTimers();
-      const timeout = 1;
-      let timeoutCalled = false;
+  it("should timeout", async () => {
+    const timeout = 1;
 
-      global.fetch = vi.fn(
-        (input: string | URL | Request, init?: RequestInit | undefined) => {
-          const { promise, resolve, reject } = withResolvers();
-          setTimeout(() => {
-            if (init?.signal?.aborted) {
-              reject("Aborted");
-            } else {
-              resolve({ json: () => ({ test: 100 }) });
-            }
-          }, timeout + 1);
+    global.fetch = vi.fn(
+      (input: string | URL | Request, init?: RequestInit | undefined) => {
+        const { promise, resolve, reject } = withResolvers();
+        setTimeout(() => {
+          if (init?.signal?.aborted) {
+            reject("Aborted");
+          } else {
+            resolve({ json: () => ({ test: 100 }) });
+          }
+        }, timeout + 1);
 
-          return promise as Promise<Response>;
-        }
-      );
-      const timeoutCB = vi.fn();
-      const cb = vi.fn();
-      const errCB = vi.fn();
-      const abortCB = vi.fn();
+        return promise as Promise<Response>;
+      }
+    );
+    const timeoutCB = vi.fn();
+    const cb = vi.fn();
+    const errCB = vi.fn();
+    const abortCB = vi.fn();
 
-      const client = new HttpClient();
+    const client = new HttpClient();
 
-      client
-        .fetch("timeoutTest", {
-          timeout,
-          onTimeout: timeoutCB,
-          onAbort: abortCB,
-        })
-        .then(cb)
-        .catch(errCB);
+    let res;
+    let err;
 
-      vi.advanceTimersByTime(timeout + 2);
-      vi.useRealTimers();
+    try {
+      res = await client.fetch("timeoutTest", {
+        timeout,
+        onTimeout: timeoutCB,
+        onAbort: abortCB,
+        onSuccess: cb,
+        onError: errCB,
+      });
+    } catch (error) {
+      err = error;
+    }
 
-      setTimeout(() => {
-        expect(timeoutCB).toHaveBeenCalled();
-        expect(abortCB).toHaveBeenCalled();
-        expect(errCB).toHaveBeenCalled();
-        expect(cb).not.toHaveBeenCalled();
-        done();
-      }, timeout + 2);
-    });
+    expect(timeoutCB).toHaveBeenCalled();
+    expect(abortCB).not.toHaveBeenCalled();
+    expect(errCB).toHaveBeenCalled();
+    expect(cb).not.toHaveBeenCalled();
+    expect(res).toBeUndefined();
+    expect(err).toBeDefined();
+
+    return;
   });
 });
