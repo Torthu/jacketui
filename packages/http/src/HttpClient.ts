@@ -260,7 +260,6 @@ export class HttpClient {
           p.reject(error);
           p.onError?.(error);
           if (wasAborted && !wasTimeout) {
-            console.log("CALL ONABORT", !!p.onAbort);
             p.onAbort?.(error);
           }
           if (wasTimeout) {
