@@ -7,3 +7,11 @@ Pub-sub based on thinking from [compassionate components](https://www.youtube.co
 We want flexibility in our components and escape hatches in order to solve edge cases and make components truly expandable and reusable.
 
 In order to achieve this we need to create flexible components, meaning expandable and full of escape hatches in order to cater for edge cases.
+
+## Usage
+
+const broadcast = new Broadcast();
+
+broadcast.on("eventName", console.log);
+broadcast.emit("eventName", "Hello World");
+broadcast.off("eventName", console.log);
