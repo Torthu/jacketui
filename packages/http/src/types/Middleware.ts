@@ -1,15 +1,8 @@
-import { AbortError, TimeoutError } from "../errors";
 import { FetchOptions } from "./FetchOptions";
 
 export interface Middleware {
-  onRequest?: (
-    request: string | URL | Request,
-    options: FetchOptions
-  ) => [Request, FetchOptions];
+  onRequest?: (request: string | URL | Request) => string | URL | Request;
   onResponse?: (response: Response) => Response;
-  onRequestError?: (error: any) => any;
-  onResponseError?: (error: any) => any;
-  onTimeout?: (error: TimeoutError) => TimeoutError | void;
-  onAbort?: (error: AbortError) => AbortError | void;
-  onRetry?: (request: string | URL | Request, options: FetchOptions) => any;
+  onRequestError?: FetchOptions["onRequestError"];
+  onResponseError?: FetchOptions["onResponseError"];
 }

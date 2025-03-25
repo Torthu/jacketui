@@ -1,4 +1,5 @@
-import { abort, HttpClient } from "../src/HttpClient";
+import { AbortError } from "../src/errors";
+import { HttpClient } from "../src/HttpClient";
 import { withResolvers } from "../src/withResolvers";
 import {
   describe,

@@ -1,4 +1,6 @@
 import { AbortError } from "./errors/AbortError";
+import { ClientError } from "./errors/ClientError";
+import { ServerError } from "./errors/ServerError";
 import { TimeoutError } from "./errors/TimeoutError";
 import { md5 } from "./md5";
 import { FetchOptions } from "./types/FetchOptions";
@@ -19,11 +21,32 @@ export class HttpClient {
 
   private middleware: Middleware[] = [];
 
-  constructor() {
+  constructor({ middleware }: { middleware?: Middleware[] } = {}) {
+    this.middleware = middleware || [];
+
     this.fetch = this.fetch.bind(this);
     this.getInFlight = this.getInFlight.bind(this);
     this.abort = this.abort.bind(this);
     this.getRequest = this.getRequest.bind(this);
+  }
+
+  /** addMiddleware(middleware);
+   *  Adds a middleware to the client.
+   *  Middleware is executed in the order it was added.
+   *  Middleware can be used to modify requests, responses, errors, etc.
+   *
+   *  @TODO NOTE: Only onRequest is currently implemented.
+   *
+   *  Middleware is an object with the following optional properties:
+   *  - onRequest: (request: string | URL | Request) => string | URL | Request
+   *  - onResponse: (response: Response) => Response
+   *  - onRequestError: (error: any) => any
+   *  - onResponseError: (error: any) => any
+   *
+   * @param middleware
+   */
+  public addMiddleware(middleware: Middleware) {
+    this.middleware.push(middleware);
   }
 
   /** wasAborted(error);
@@ -58,15 +81,7 @@ export class HttpClient {
    */
   public fetch(
     request: string | URL | Request,
-    {
-      onSuccess,
-      onAbort,
-      onError,
-      onRetry,
-      onTimeout,
-      retry = 0,
-      timeout = 0,
-    }: FetchOptions = {}
+    { retry = 0, timeout = 0, ...rest }: FetchOptions = {}
   ): Promise<Response> {
     const hash = md5(request);
     let inFlight = this.getInFlight(hash);
@@ -92,11 +107,7 @@ export class HttpClient {
       promise,
       reject,
       resolve,
-      onSuccess,
-      onError,
-      onAbort,
-      onRetry,
-      onTimeout,
+      ...rest,
     });
 
     return promise as Promise<Response>;
@@ -166,6 +177,16 @@ export class HttpClient {
     timeout = 0
   ): [Promise<Response>, AbortController] {
     const controller = new AbortController();
+
+    const mwArr = this.middleware
+      .filter((m) => !!m.onRequest)
+      .map((m) => m.onRequest);
+
+    // Apply onRequest middleware
+    if (mwArr.length > 0) {
+      request = mwArr.reduce((req, mw) => (mw ? mw(req) : req), request);
+    }
+
     const fetchPromise = globalThis.fetch(request, {
       signal: controller.signal,
     });
@@ -181,13 +202,23 @@ export class HttpClient {
         if (fetchTimeout) {
           clearTimeout(fetchTimeout);
         }
-        this._fetchSuccess(response, hash);
+
+        response = this.middleware
+          .filter((m) => !!m.onResponse)
+          .map((m) => m.onResponse)
+          .reduce((res, mw) => (mw ? mw(res) : res), response);
+
+        if (response.ok) {
+          this._fetchSuccess(response, hash);
+        } else {
+          this._fetchResponseError(response, hash);
+        }
       })
       .catch((error) => {
         if (fetchTimeout) {
           clearTimeout(fetchTimeout);
         }
-        this._fetchError(error, hash);
+        this._fetchRequestError(error, hash);
       })
       .finally(() => {
         this._fetchFinally(hash);
@@ -198,6 +229,7 @@ export class HttpClient {
 
   private _retry(hash: string) {
     const inFlight = this.getInFlight(hash);
+
     if (inFlight && inFlight.retry > 0) {
       inFlight.promises.forEach((p) => {
         p.onRetry?.(inFlight.retry, inFlight.error);
@@ -231,7 +263,39 @@ export class HttpClient {
     }
   }
 
-  private _fetchError(reason: any, hash: string) {
+  private _fetchResponseError(response: Response, hash: string) {
+    const inFlight = this.getInFlight(hash);
+
+    if (inFlight) {
+      let error;
+
+      if (response.status >= 400 && response.status < 500) {
+        error = new ClientError(
+          response.statusText,
+          inFlight.request,
+          response
+        );
+      } else if (response.status >= 500 && response.status < 600) {
+        error = new ServerError(
+          response.statusText,
+          inFlight.request,
+          response
+        );
+      } else {
+        error = new Error(response.statusText);
+      }
+
+      inFlight.error = error;
+
+      inFlight.promises.forEach((p) => {
+        p.reject(error);
+        p.onResponseError?.(error);
+        p.onError?.(error);
+      });
+    }
+  }
+
+  private _fetchRequestError(reason: any, hash: string) {
     const inFlight = this.getInFlight(hash);
     let error: Error;
 
@@ -258,13 +322,15 @@ export class HttpClient {
       if (inFlight.retry <= 0) {
         inFlight.promises.forEach((p) => {
           p.reject(error);
+          p.onRequestError?.(error);
           p.onError?.(error);
+
           if (wasAborted && !wasTimeout) {
             console.log("CALL ONABORT", !!p.onAbort);
             p.onAbort?.(error);
           }
           if (wasTimeout) {
-            p.onTimeout?.();
+            p.onTimeout?.(error);
           }
         });
       }
@@ -283,12 +349,3 @@ export class HttpClient {
     }
   }
 }
-
-const instance = new HttpClient();
-
-export const fetch = instance.fetch;
-export const abort = instance.abort;
-export const getInFlight = instance.getInFlight;
-export const getRequest = instance.getRequest;
-export const wasAborted = HttpClient.wasAborted;
-export const wasTimeout = HttpClient.wasTimeout;

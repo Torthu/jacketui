@@ -1,5 +1,6 @@
 {
   "name": "@torthu/jacketui-http",
+  "private": true,
   "version": "0.1.0",
   "description": "HTTP Client",
   "main": "index.ts",
