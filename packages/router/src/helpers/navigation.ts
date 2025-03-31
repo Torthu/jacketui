@@ -1,8 +1,8 @@
 const history = window.history;
 
 interface Options {
-  scrollRestoration?: boolean;
-  linkText?: string;
+  scrollRestoration?: "auto" | "manual" | boolean;
+  data?: any;
 }
 
 const emitEvent = (oldURL: string, newURL: string) => {
@@ -10,38 +10,71 @@ const emitEvent = (oldURL: string, newURL: string) => {
   window.dispatchEvent(event);
 };
 
-/** go
+/** **go**(to, options)
+ *
  * Go to new URL, wraps History.pushState()
- * @param to Location to go to, e.g ("/page/2")
- * @param options
+ *
+ * @param {string} to Location to go to, e.g ("/page/2")
+ * @param {Object} [options] { scrollRestoration: boolean, linkText: string }
+ * @param {string} [options.scrollRestoration] whether to restore scroll position automatically
+ * @param {any} [options.data=null] data to store in the history state
  *
  * @example
  *   go("/some/page", {scrollRestoration: "auto"});
+ *   go("/some/page", {scrollRestoration: "manual"});
+ *   go("/some/page", {data: {some: "data"}});
+ *   go("/some/page", {scrollRestoration: "auto", data: {some: "data"}});
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/History/pushState
  */
-export const go = (to: string, options?: Options): void => {
-  if (typeof options?.scrollRestoration === "boolean") {
-    history.scrollRestoration = options.scrollRestoration ? "auto" : "manual";
+export const go = (
+  to: string,
+  { scrollRestoration, data = null }: Options = {}
+): void => {
+  if (typeof scrollRestoration === "boolean") {
+    history.scrollRestoration = scrollRestoration ? "auto" : "manual";
+  } else if (typeof scrollRestoration === "string") {
+    history.scrollRestoration = scrollRestoration;
   }
 
   const oldUrl = location.href;
-  history.pushState({}, options?.linkText ?? "", "#" + to);
+  history.pushState(data, "", "#" + to);
   const newUrl = location.href;
 
   emitEvent(oldUrl, newUrl);
 };
 
-/** replace
+/** **replace**(to, options)
+ *
  * Replace current history item, wraps History.replaceState()
- * @param to Location to replace with, e.g ("/page/2")
- * @param options
+ *
+ * @param {string} to Location to replace with, e.g ("/page/2")
+ * @param {Object} [options] { scrollRestoration: boolean, linkText: string }
+ * @param {string} [options.scrollRestoration] whether to restore scroll position automatically
+ * @param {any} [options.data=null] data to store in the history state
+ *
+ * @example
+ *  replace("/some/page");
+ *  replace("/some/page", {scrollRestoration: "auto"});
+ *  replace("/some/page", {data: {some: "data"}});
+ *  replace("/some/page", {scrollRestoration: "auto", data: {some: "data"}});
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/History/replaceState
  */
-export const replace = (to: string, options?: Options): void => {
-  if (typeof options?.scrollRestoration === "boolean") {
-    history.scrollRestoration = options.scrollRestoration ? "auto" : "manual";
+export const replace = (
+  to: string,
+  { scrollRestoration, data = null }: Options = {}
+): void => {
+  if (typeof scrollRestoration === "boolean") {
+    history.scrollRestoration = scrollRestoration ? "auto" : "manual";
+  } else if (typeof scrollRestoration === "string") {
+    history.scrollRestoration = scrollRestoration;
   }
+
   const oldUrl = location.href;
-  history.replaceState({}, options?.linkText ?? "", "#" + to);
+  history.replaceState(data, "", "#" + to);
   const newUrl = location.href;
+
   emitEvent(oldUrl, newUrl);
 };
 
