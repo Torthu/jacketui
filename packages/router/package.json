@@ -1,6 +1,6 @@
 {
   "name": "@torthu/jacketui-router",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "Simple Router implementation.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
