@@ -7,9 +7,12 @@ export interface RouterProps {
   path?: string;
 }
 
-/** Router
- *  Simple router implementation using # urls.
- *  The router listens to hashchange events and updates the RouteContext with currentPath.
+/** **Router**
+ *
+ * Simple router implementation using # urls.
+ * The router listens to hashchange events and updates the RouteContext with currentPath.
+ *
+ * @param {string} path The root path of the router. Defaults to "/".
  *
  * @example
  *  <Router>

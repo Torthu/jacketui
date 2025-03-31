@@ -14,12 +14,16 @@ export interface RouteProps extends BaseComponentProps {
   [key: string]: unknown;
 }
 
-/** Route
+/** **Route**
+ *
  *  Wrapper for a single route within a Router context.
+ *
  *  If Route as={Component} syntax is used, the component will be called with routeProps (e.g /path/:id/:subid => {id: string, subid: string}).
  *  A matched route's routeProps are also available with the useRoute() hook.
  *
  *  @param {string} path The full path to this route
+ *  @param {string | ReactNode} as The component to render when this route is matched. Defaults to Fragment.
+ *  @param {object} rest Any other props will be passed on.
  *
  *  @return {ReactNode | null}
  *

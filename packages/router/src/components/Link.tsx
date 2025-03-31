@@ -7,10 +7,20 @@ interface LinkProps extends BaseComponentProps {
   href: string;
 }
 
-/** Link
+/** **Link**
+ *
  *  Anchors. Supports relative paths.
  *
- * @param {string} href
+ * @param {string} href The path to link to.
+ *
+ * @example Absolute path
+ *   <Link href="/page/2">Page 2</Link>
+ *
+ * @example Absolute path tilde
+ *   <Link href="~">Home</Link>
+ *
+ * @example Relative path
+ *   <Link href="..">Back</Link>
  */
 export function Link({ href, as = "a", ...rest }: LinkProps) {
   const { routeSegments, currentPath } = useRoute();
