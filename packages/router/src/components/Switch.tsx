@@ -1,5 +1,4 @@
-import { cloneElement, Fragment, isValidElement, useContext } from "react";
-import { RouterContext } from "../contexts";
+import { cloneElement, Fragment, isValidElement } from "react";
 import { createRouteRegex, joinRoutePaths, matchRoute } from "../helpers";
 import { RouteProps } from "./Route";
 import { useRoute } from "../hooks";
@@ -25,7 +24,8 @@ const flattenChildren = (
   }
 };
 
-/** Switch
+/** **Switch**
+ *
  *  Returns first matched Route
  *
  *  @example
