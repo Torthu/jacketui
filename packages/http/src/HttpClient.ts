@@ -32,12 +32,8 @@ export class HttpClient {
    * @param {DOMException | Error} error
    * @returns boolean
    */
-  private _wasAborted(error: DOMException | Error | string): boolean {
-    if (typeof error === "string") {
-      return error === "AbortError" || error === "Aborted";
-    } else {
-      return error?.name === "AbortError" || error?.name === "Aborted";
-    }
+  private _wasAborted(inFlight: InFlight<unknown>): boolean {
+    return inFlight.controller.signal.aborted;
   }
 
   /** wasTimeout(error);
@@ -47,7 +43,7 @@ export class HttpClient {
    * @returns boolean
    */
   private _wasTimeout(inFlight: InFlight<unknown>): boolean {
-    return inFlight.controller.signal.reason === "Timeout";
+    return inFlight.timeoutSignal?.aborted ?? false;
   }
 
   /** fetch(request)
@@ -73,13 +69,18 @@ export class HttpClient {
     const { promise, resolve, reject } = withResolvers();
 
     if (!inFlight) {
-      const [fetchPromise, controller] = this._doFetch(request, hash, timeout);
+      const [fetchPromise, abortController, timeoutSignal] = this._doFetch(
+        request,
+        hash,
+        timeout
+      );
 
       inFlight = {
         hash,
         request,
         fetchPromise,
-        controller,
+        controller: abortController,
+        timeoutSignal,
         retry,
         promises: [],
         timeout,
@@ -144,7 +145,8 @@ export class HttpClient {
    *   httpClient.abort(promise);
    */
   public abort(promise: Promise<any> | string, reason?: any): void {
-    this.getInFlight(promise)?.controller.abort(reason);
+    const error = new AbortError(reason);
+    this.getInFlight(promise)?.controller.abort(error);
   }
 
   /** getRequest(promise);
@@ -164,36 +166,32 @@ export class HttpClient {
     request: string | URL | Request,
     hash: string,
     timeout = 0
-  ): [Promise<Response>, AbortController] {
-    const controller = new AbortController();
+  ): [Promise<Response>, AbortController, AbortSignal | undefined] {
+    const abortController = new AbortController();
+    let timeoutSignal = timeout > 0 ? AbortSignal.timeout(timeout) : undefined;
+
+    const signalArray = [abortController.signal];
+
+    if (timeoutSignal) {
+      signalArray.push(timeoutSignal);
+    }
+
     const fetchPromise = globalThis.fetch(request, {
-      signal: controller.signal,
+      signal: AbortSignal.any(signalArray),
     });
-    const fetchTimeout =
-      timeout > 0
-        ? setTimeout(() => {
-            controller.abort("Timeout");
-          }, timeout)
-        : null;
 
     fetchPromise
       .then((response) => {
-        if (fetchTimeout) {
-          clearTimeout(fetchTimeout);
-        }
         this._fetchSuccess(response, hash);
       })
       .catch((error) => {
-        if (fetchTimeout) {
-          clearTimeout(fetchTimeout);
-        }
         this._fetchError(error, hash);
       })
       .finally(() => {
         this._fetchFinally(hash);
       });
 
-    return [fetchPromise, controller];
+    return [fetchPromise, abortController, timeoutSignal];
   }
 
   private _retry(hash: string) {
@@ -236,7 +234,7 @@ export class HttpClient {
     let error: Error;
 
     if (inFlight) {
-      const wasAborted = this._wasAborted(reason);
+      const wasAborted = this._wasAborted(inFlight);
       const wasTimeout = this._wasTimeout(inFlight);
 
       if (wasTimeout) {

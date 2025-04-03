@@ -3,6 +3,8 @@ export interface InFlight<T> {
   request: string | URL | Request;
   fetchPromise: Promise<T>;
   controller: AbortController;
+  timeoutSignal?: AbortSignal;
+
   promises: Array<{
     promise: Promise<unknown>;
     reject: (reason?: any) => void;
@@ -14,6 +16,7 @@ export interface InFlight<T> {
     onTimeout?: () => void;
     onRetry?: (retry: number, reason?: any) => void;
   }>;
+
   error?: any;
   retry: number;
   timeout?: number;
