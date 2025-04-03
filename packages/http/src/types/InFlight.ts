@@ -1,3 +1,5 @@
+import { FetchOptions } from "./FetchOptions";
+
 export interface InFlight<T> {
   hash: string;
   request: string | URL | Request;
@@ -9,12 +11,11 @@ export interface InFlight<T> {
     promise: Promise<unknown>;
     reject: (reason?: any) => void;
     resolve: (response: unknown) => void;
-
-    onSuccess?: (response: unknown) => void;
-    onError?: (reason?: any) => void;
-    onAbort?: (reason?: any) => void;
-    onTimeout?: () => void;
-    onRetry?: (retry: number, reason?: any) => void;
+    onSuccess?: FetchOptions["onSuccess"];
+    onError?: FetchOptions["onError"];
+    onAbort?: FetchOptions["onAbort"];
+    onTimeout?: FetchOptions["onTimeout"];
+    onRetry?: FetchOptions["onRetry"];
   }>;
 
   error?: any;

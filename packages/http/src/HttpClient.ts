@@ -144,9 +144,11 @@ export class HttpClient {
    *   const promise = httpClient.fetch("https://api.example.com");
    *   httpClient.abort(promise);
    */
-  public abort(promise: Promise<any> | string, reason?: any): void {
-    const error = new AbortError(reason);
-    this.getInFlight(promise)?.controller.abort(error);
+  public abort(
+    promise: Promise<any> | string,
+    reason: string = "aborted"
+  ): void {
+    this.getInFlight(promise)?.controller.abort(reason);
   }
 
   /** getRequest(promise);
@@ -244,11 +246,12 @@ export class HttpClient {
       } else if (typeof reason === "string") {
         error = new Error(reason);
       } else {
-        error = reason;
+        error = new Error(reason?.message || reason);
       }
 
       inFlight.error = error;
 
+      // We will retry on timeouts, but not if explicitly aborted
       if (wasAborted && !wasTimeout) {
         inFlight.retry = 0;
       }
@@ -257,11 +260,13 @@ export class HttpClient {
         inFlight.promises.forEach((p) => {
           p.reject(error);
           p.onError?.(error);
-          if (wasAborted && !wasTimeout) {
+
+          if (wasAborted) {
             p.onAbort?.(error);
           }
+
           if (wasTimeout) {
-            p.onTimeout?.();
+            p.onTimeout?.(error);
           }
         });
       }

@@ -1,9 +1,11 @@
+import { AbortError, TimeoutError } from "../errors";
+
 export interface FetchOptions {
   onSuccess?: (response: unknown) => void;
-  onError?: (reason?: any) => void;
-  onAbort?: (reason?: any) => void;
-  onRetry?: (retry: number, reason?: any) => void;
-  onTimeout?: () => void;
+  onError?: (error: Error | TimeoutError | AbortError) => void;
+  onAbort?: (error: AbortError) => void;
+  onRetry?: (retry: number, error: Error | TimeoutError | AbortError) => void;
+  onTimeout?: (error: TimeoutError) => void;
   retry?: number;
   timeout?: number;
 }
