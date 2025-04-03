@@ -111,9 +111,6 @@ export class Store<State extends object, Action extends BasicAction> {
   /** patch(newPartialState: Partial<State>)
    *  Merges newPartialState with the current state into a new object.
    *
-   * @TODO Is this useful, or is it easy enough to implement an actionHandler manually?
-   * Path the state with a state partial object
-   *
    * @param newState Partial<State>
    * @return {State} the new state
    *
@@ -144,6 +141,10 @@ export class Store<State extends object, Action extends BasicAction> {
    *
    * @param {StateAboutToChangeCallback<State>} callback
    * @return {StateAboutToChangeCallback<State>}
+   *
+   * @example
+   *   const listener = store.onPreDataChanged(console.log); // logs the new state and action
+   *   store.offPreDataChanged(listener); // no more logging
    */
   public onPreDataChanged(callback: StateAboutToChangeCallback<State, Action>) {
     return this._broadcast.on("preStateChange", (e) => {
@@ -157,6 +158,10 @@ export class Store<State extends object, Action extends BasicAction> {
    *  Remove a pre data changed listener
    *
    * @param {StateAboutToChangeCallback<State>} callback
+   *
+   * @example
+   *   const listener = store.onPreDataChanged(console.log); // logs the new state and action
+   *   store.offPreDataChanged(listener); // no more logging
    */
   public offPreDataChanged(callback: BroadcastCallbackFunction<any>): void {
     this._broadcast.off("preStateChange", callback);
@@ -166,7 +171,11 @@ export class Store<State extends object, Action extends BasicAction> {
    *  Triggered when the state changes.
    *
    * @param {StateChangedCallback<State>} callback
-   * @return {StateChangedCallback<State>}
+   * @return {BroadcastCallbackFunction<State>} listener, can be used to remove the listener
+   *
+   * @example
+   *   const listener = store.onDataChanged(console.log); // logs the new state
+   *   store.offDataChanged(listener); // no more logging
    */
   public onDataChanged(callback: StateChangedCallback<State>) {
     return this._broadcast.on("stateChanged", (e) => {
@@ -177,16 +186,23 @@ export class Store<State extends object, Action extends BasicAction> {
   }
 
   /** offDataChanged(callback)
-   *  Remove a data changed listener
+   *
+   * Remove a data changed listener
    *
    * @param callback StateChangedCallback<State>
+   *
+   * @example
+   *   const listener = store.onDataChanged(console.log); // logs the new state
+   *   store.offDataChanged(listener); // no more logging
    */
   public offDataChanged(callback: BroadcastCallbackFunction<any>): void {
     this._broadcast.off("stateChanged", callback);
   }
 
   /** getState()
+   *
    * Gets the current state. getState is passed to action handlers.
+   *
    * @returns {State} the current state
    */
   public getState(): State {
@@ -194,6 +210,7 @@ export class Store<State extends object, Action extends BasicAction> {
   }
 
   /** setState(newState)
+   *
    *  Sets the state if it is different from the current state and triggers onStateChanged.
    *  setState is passed as the commit callback to async action handlers.
    *

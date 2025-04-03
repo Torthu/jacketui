@@ -2,7 +2,8 @@ import { useRef, useState } from "react";
 import { Store } from "./Store";
 import { BasicAction, ActionHandler, Dispatch } from "./types";
 
-/** useStore(actionHandlers, initialState)
+/** **useStore**(actionHandlers, initialState)
+ *
  *  Hook for using a Store.
  *
  * @param {ActionHandler[]} actionHandlers
