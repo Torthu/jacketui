@@ -1,6 +1,6 @@
-# JacketUI SuperFetch
+# JacketUI Bring
 
-Utilities for creating React component systems based on thoughts from [compassionate components](https://www.youtube.com/watch?v=VKQAS3PNEVw&pp=ygUYY29tcGFzc2lvbmF0ZSBjb21wb25lbnRz).
+Bring is a fetch wrapper that provides a simple API for making HTTP requests. It supports retrying, timeouts and callbacks. And will return a Result ({ok: true, value} | {ok: false, error}) instead of throwing errors.
 
 ## Philosophy
 
