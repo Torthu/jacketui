@@ -1,0 +1,21 @@
+{
+  "name": "@torthu/jacketui-bring",
+  "version": "0.0.1",
+  "description": "Improved fetch API with retry, timeout, and more.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "author": {
+    "name": "Torstein Thune",
+    "email": "torstein@thune.io",
+    "url": "https://thune.io"
+  },
+  "peerDependencies": {},
+  "devDependencies": {},
+  "dependencies": {},
+  "scripts": {
+    "prepublish": "npm run build",
+    "build": "rimraf ./dist && tsc",
+    "test": "vitest run"
+  },
+  "license": "GPL-3.0-only"
+}
