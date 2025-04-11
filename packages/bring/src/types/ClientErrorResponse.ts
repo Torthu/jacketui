@@ -63,7 +63,7 @@ const clientStatusErrorSet = new Set(
   Object.keys(clientStatusErrorMap).map((s) => parseInt(s, 10))
 );
 
-interface ClientErrorResponse extends Response {
+export interface ClientErrorResponse extends Response {
   status: ClientErrorStatus;
 }
 
