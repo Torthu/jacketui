@@ -15,7 +15,9 @@
   "scripts": {
     "build": "npm run build-base && npm run build --workspaces --if-present",
     "build-base": "npm run build --workspace=packages/base",
+    "build-bring": "npm run build --workspace=packages/bring",
     "build-broadcast": "npm run build --workspace=packages/broadcast",
+    "build-core": "npm run build --workspace=packages/core",
     "build-components": "npm run build --workspace=packages/components",
     "build-forms": "npm run build --workspace=packages/forms",
     "build-http": "npm run build --workspace=packages/http",
@@ -24,6 +26,8 @@
     "build-translate": "npm run build --workspace=packages/translate",
     "publish": "npm run build && npm run test && npm publish --workspaces",
     "publish-base": "npm run build-base && npm publish --workspace=packages/base",
+    "publish-core": "npm run build-core && npm publish --workspace=packages/core",
+    "publish-bring": "npm run build-bring && npm publish --workspace=packages/bring",
     "publish-broadcast": "npm run build-broadcast && npm publish --workspace=packages/broadcast",
     "publish-components": "npm publish --workspace=packages/components",
     "publish-forms": "npm run build-forms && npm publish --workspace=packages/forms",
