@@ -2,6 +2,8 @@
   "name": "@torthu/jacketui",
   "workspaces": [
     "packages/base",
+    "packages/core",
+    "packages/bring",
     "packages/broadcast",
     "packages/components",
     "packages/forms",
@@ -11,7 +13,7 @@
     "packages/translate"
   ],
   "scripts": {
-    "build": "npm run build-base && npm run build-components && npm run build-forms && npm run build-translate && npm run build-store && npm run build-router && npm run build-http",
+    "build": "npm run build-base && npm run build --workspaces --if-present",
     "build-base": "npm run build --workspace=packages/base",
     "build-broadcast": "npm run build --workspace=packages/broadcast",
     "build-components": "npm run build --workspace=packages/components",
@@ -29,12 +31,15 @@
     "publish-router": "npm run build-router && npm publish --workspace=packages/router",
     "publish-store": "npm run build-store && npm publish --workspace=packages/store",
     "publish-translate": "npm run build-translate && npm publish --workspace=packages/translate",
-    "test": "npm run test --workspaces",
-    "link": "npm link --workspaces"
+    "test": "npm run test --workspaces --if-present",
+    "link": "npm link --workspaces",
+    "docs": "npm run docs --workspaces --if-present"
   },
   "devDependencies": {
     "rimraf": "^6.0.1",
-    "typescript": "^5.7.3"
+    "typedoc": "^0.28.1",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.3"
   },
   "license": "GPL-3.0-only"
 }

@@ -1,0 +1,23 @@
+{
+  "name": "@torthu/jacketui-core",
+  "version": "0.0.1",
+  "description": "Helpers and utility functions.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "vitest run",
+    "prepublish": "npm run build",
+    "build": "rimraf ./dist && tsc"
+  },
+  "keywords": [],
+  "author": {
+    "email": "torstein@thune.io",
+    "name": "Torstein Thune",
+    "url": "https://thune.io"
+  },
+  "license": "GPL-3.0-only",
+  "devDependencies": {
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.6"
+  }
+}
