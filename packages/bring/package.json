@@ -1,6 +1,6 @@
 {
   "name": "@torthu/jacketui-bring",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Improved fetch API with retry, timeout, and more.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
