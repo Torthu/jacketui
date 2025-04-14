@@ -1,4 +1,11 @@
-import { AbortError, BringError, TimeoutError } from "../errors";
+import {
+  AbortError,
+  BringError,
+  ClientError,
+  NetworkError,
+  ServerError,
+  TimeoutError,
+} from "../errors";
 
 type TypedArray =
   | Int8Array
@@ -15,12 +22,13 @@ type TypedArray =
 
 export interface BringCallbacks {
   onAbort?: (error: AbortError) => void;
+  onNetworkError?: (error: NetworkError) => void;
   onError?: (error: BringError) => void;
   onRetry?: (retryNum: number) => void;
   onSuccess?: (response: Response) => void;
   onTimeout?: (error: TimeoutError) => void;
-  onClientError?: (response: Response) => void;
-  onServerError?: (response: Response) => void;
+  onClientError?: (error: ClientError) => void;
+  onServerError?: (error: ServerError) => void;
 }
 
 export interface RequestInit {

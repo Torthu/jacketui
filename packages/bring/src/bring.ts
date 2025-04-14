@@ -69,6 +69,7 @@ export const bring = (init: BringInit | BringError) => {
     onTimeout,
     onClientError,
     onServerError,
+    onNetworkError,
     ...requestInit
   } = init;
 
@@ -102,83 +103,90 @@ export const bring = (init: BringInit | BringError) => {
             method: requestInit.method ?? "GET",
             reason: abortController.signal.reason,
           },
+          cause: error,
           url,
           requestInit: init,
         });
-        resolve(failure(abortError));
+
         onAbort?.(abortError);
         onError?.(abortError);
-        return;
+        return resolve(failure(abortError));
       }
+
       if (timeoutSignal?.aborted) {
-        const error = new TimeoutError("Timeout", {
-          context: { reason: timeoutSignal.reason, timeout },
+        const timeoutError = new TimeoutError("Timeout", {
+          context: {
+            reason: timeoutSignal.reason,
+            timeout,
+          },
+          cause: error,
           url,
           requestInit: init,
         });
-        resolve(failure(error));
-        onTimeout?.(error);
-        onError?.(error);
-        return;
+
+        onTimeout?.(timeoutError);
+        onError?.(timeoutError);
+        return resolve(failure(error));
       }
 
       if (error instanceof Error) {
-        resolve(
-          failure(
-            new BringError(error.message, {
-              cause: error,
-              context: { url, method: requestInit.method ?? "GET" },
-              url,
-              requestInit: init,
-            })
-          )
-        );
-        return;
+        const networkError = new NetworkError(error.message, {
+          context: { url, method: requestInit.method ?? "GET" },
+          cause: error,
+          url,
+          requestInit: init,
+        });
+
+        onError?.(networkError);
+        return resolve(failure(networkError));
       }
 
       if (typeof error === "string") {
-        resolve(failure(new BringError(error, { url, requestInit: init })));
-        return;
+        return resolve(
+          failure(new BringError(error, { url, requestInit: init }))
+        );
       }
 
-      resolve(
+      return resolve(
         failure(new BringError("Unknown error", { url, requestInit: init }))
       );
     } else {
-      const response = value!;
+      const response = value;
 
       if (response.ok) {
-        resolve(success(response));
         onSuccess?.(response);
+        return resolve(success(response));
       } else {
         if (isClientErrorResponse(response)) {
-          return failure(
-            new ClientError(response.statusText, {
-              context: {
-                status: response.status,
-                statusText: response.statusText,
-              },
-              response,
-              requestInit: init,
-              url,
-            })
-          );
+          const clientError = new ClientError(response.statusText, {
+            context: {
+              status: response.status,
+              statusText: response.statusText,
+            },
+            response,
+            requestInit: init,
+            url,
+          });
+          onClientError?.(clientError);
+          onError?.(clientError);
+          return resolve(failure(clientError));
         }
         if (isServerErrorResponse(response)) {
-          return failure(
-            new ServerError(response.statusText, {
-              response,
-              requestInit: init,
-              url,
-              context: {
-                status: response.status,
-                statusText: response.statusText,
-              },
-            })
-          );
+          const serverError = new ServerError(response.statusText, {
+            response,
+            requestInit: init,
+            url,
+            context: {
+              status: response.status,
+              statusText: response.statusText,
+            },
+          });
+          onServerError?.(serverError);
+          onError?.(serverError);
+          return resolve(failure(serverError));
         }
 
-        const error = new BringError("Fetch failed", {
+        const unknownError = new BringError("Fetch failed", {
           context: {
             url,
             status: response.status,
@@ -188,8 +196,9 @@ export const bring = (init: BringInit | BringError) => {
           requestInit: init,
           response,
         });
-        resolve(failure(error));
-        onError?.(error);
+
+        onError?.(unknownError);
+        return resolve(failure(unknownError));
       }
     }
   });

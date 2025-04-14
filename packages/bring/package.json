@@ -9,9 +9,12 @@
     "email": "torstein@thune.io",
     "url": "https://thune.io"
   },
-  "peerDependencies": {},
-  "devDependencies": {},
-  "dependencies": {},
+  "devDependencies": {
+    "fetch-mock": "^12.5.2"
+  },
+  "dependencies": {
+    "@torthu/jacketui-core": "latest"
+  },
   "scripts": {
     "prepublish": "npm run build",
     "build": "rimraf ./dist && tsc",
