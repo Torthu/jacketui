@@ -1,7 +1,6 @@
 import { BringInitDecorator } from "../types/BringDecorator";
-import { BringInit } from "../types/BringInit";
 
-/** jsonBody(body: BringInit["body"]): BringInitDecorator
+/** jsonBody(body: any): BringInitDecorator
  *
  * Sets the body of the request to a JSON string.
  *
@@ -9,5 +8,5 @@ import { BringInit } from "../types/BringInit";
  * @returns BringInitDecorator
  */
 export const jsonBody =
-  (body: BringInit["body"]): BringInitDecorator =>
+  (body: any): BringInitDecorator =>
   (init) => ({ ...init, body: JSON.stringify(body) });
