@@ -2,6 +2,7 @@ export * from "./cache";
 export * from "./cors";
 export * from "./credentials";
 export * from "./header";
+export * from "./headers";
 export * from "./integrity";
 export * from "./keepalive";
 export * from "./method";
@@ -12,6 +13,7 @@ export * from "./retry";
 export * from "./body";
 export * from "./jsonBody";
 export * from "./priority";
+export * from "./url";
 
 export * from "./backoff";
 export * from "./jitter";
