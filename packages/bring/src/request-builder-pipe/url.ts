@@ -11,8 +11,8 @@ import { BringInit } from "../types/BringInit";
  * @returns BringDecorator
  */
 export const url =
-  (url: BringInit["url"]): BringInitDecorator =>
-  (init) => ({
+  (url: BringInit["url"]): ((init?: BringInit) => BringInit) =>
+  (init = { url }) => ({
     ...init,
     url,
   });
