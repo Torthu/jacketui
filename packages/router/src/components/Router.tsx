@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { getHashPath } from "../helpers";
 import { RouteContext } from "../contexts";
 
@@ -23,17 +23,19 @@ export const Router = ({
   children,
   path = "",
 }: RouterProps): React.ReactElement => {
-  const [currentPath, setCurrentPath] = useState(getHashPath(location));
+  const [currentPath, setCurrentPath] = useState(
+    getHashPath(globalThis.location ?? "")
+  );
   const routeSegments = useMemo(() => [path], [path]);
 
   useEffect(() => {
     const hashchange = (event: HashChangeEvent): void => {
       if (event.newURL !== event.oldURL) {
-        setCurrentPath(getHashPath(window.location));
+        setCurrentPath(getHashPath(globalThis.location));
       }
     };
-    window.addEventListener("hashchange", hashchange);
-    return () => window.removeEventListener("hashchange", hashchange);
+    globalThis.addEventListener("hashchange", hashchange);
+    return () => globalThis.removeEventListener("hashchange", hashchange);
   }, []);
 
   return (

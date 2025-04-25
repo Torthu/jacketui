@@ -1,4 +1,5 @@
-const history = window.history;
+const history = globalThis.history;
+const location = globalThis.location;
 
 interface Options {
   scrollRestoration?: "auto" | "manual" | boolean;
@@ -7,7 +8,7 @@ interface Options {
 
 const emitEvent = (oldURL: string, newURL: string) => {
   const event = new HashChangeEvent("hashchange", { oldURL, newURL });
-  window.dispatchEvent(event);
+  globalThis.dispatchEvent(event);
 };
 
 /** **go**(to, options)
