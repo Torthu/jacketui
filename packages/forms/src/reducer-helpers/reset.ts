@@ -14,8 +14,11 @@ import {
  * @returns {S} New state object
  */
 export function reset<
-  S = Record<string, FormField<unknown> | FormOptionsField<unknown>>
->(state: S, fieldName: keyof S | Array<keyof S>, value: unknown): S {
+  S extends {} = Record<string, FormField<unknown> | FormOptionsField<unknown>>
+>(state: S, fieldName?: keyof S | Array<keyof S>): S {
+  if (!fieldName) {
+    fieldName = Object.keys(state) as Array<keyof S>;
+  }
   const keys: Array<keyof S> = Array.isArray(fieldName)
     ? fieldName
     : [fieldName];

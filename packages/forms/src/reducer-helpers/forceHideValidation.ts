@@ -9,8 +9,12 @@ import { FormField, FormOptionsField, isFormField } from "../types";
  * @returns {S} New state object
  */
 export function forceHideValidation<
-  S = Record<string, FormField<unknown> | FormOptionsField<unknown>>
->(state: S, fieldName: keyof S | Array<keyof S>, value: unknown): S {
+  S extends {} = Record<string, FormField<unknown> | FormOptionsField<unknown>>
+>(state: S, fieldName?: keyof S | Array<keyof S>): S {
+  if (!fieldName) {
+    fieldName = Object.keys(state) as Array<keyof S>;
+  }
+
   const keys: Array<keyof S> = Array.isArray(fieldName)
     ? fieldName
     : [fieldName];
@@ -22,7 +26,7 @@ export function forceHideValidation<
       return;
     }
 
-    state[key] = { ...state[key], value, forceHideValidation: true };
+    state[key] = { ...state[key], forceHideValidation: true };
   });
 
   return state;

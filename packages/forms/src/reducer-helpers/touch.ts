@@ -10,7 +10,7 @@ import { FormField, FormOptionsField, isFormField } from "../types";
  */
 export function touch<
   S = Record<string, FormField<unknown> | FormOptionsField<unknown>>
->(state: S, fieldName: keyof S | Array<keyof S>, value: unknown): S {
+>(state: S, fieldName: keyof S | Array<keyof S>): S {
   const keys: Array<keyof S> = Array.isArray(fieldName)
     ? fieldName
     : [fieldName];
@@ -22,7 +22,7 @@ export function touch<
       return;
     }
 
-    state[key] = { ...state[key], value, touched: true };
+    state[key] = { ...state[key], touched: true };
   });
 
   return state;

@@ -4,13 +4,19 @@ import { FormField, FormOptionsField, isFormField } from "../types";
  *
  *  Sets forceShowValidation to true for a field or fields.
  *
+ * if fieldName is not provided, all fields will be mutated.
+ *
  * @param state {S} A state object to change
  * @param fieldName {string | string[]} Name of FormField(s) to mutate
  * @returns {S} New state object
  */
 export function forceShowValidation<
-  S = Record<string, FormField<unknown> | FormOptionsField<unknown>>
->(state: S, fieldName: keyof S | Array<keyof S>, value: unknown): S {
+  S extends {} = Record<string, FormField<unknown> | FormOptionsField<unknown>>
+>(state: S, fieldName?: keyof S | Array<keyof S>): S {
+  if (!fieldName) {
+    fieldName = Object.keys(state) as Array<keyof S>;
+  }
+
   const keys: Array<keyof S> = Array.isArray(fieldName)
     ? fieldName
     : [fieldName];
@@ -22,7 +28,7 @@ export function forceShowValidation<
       return;
     }
 
-    state[key] = { ...state[key], value, forceShowValidation: true };
+    state[key] = { ...state[key], forceShowValidation: true };
   });
 
   return state;
