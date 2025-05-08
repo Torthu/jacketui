@@ -7,3 +7,4 @@ export * from "./wrap";
 export * from "./touch";
 export * from "./forceShowValidation";
 export * from "./forceHideValidation";
+export * from "./reset";

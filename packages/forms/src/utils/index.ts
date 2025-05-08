@@ -5,3 +5,4 @@ export * from "./fieldHasError";
 export * from "./fieldHasWarning";
 export * from "./shouldShowValidation";
 export * from "./isFormValid";
+export * from "./getFormValidations";
