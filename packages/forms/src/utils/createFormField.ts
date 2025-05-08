@@ -19,6 +19,7 @@ export function createFormField<T = string>(
 ): FormField<T> {
   return {
     value: initialValue,
+    initialValue,
     focus: false,
     touched: false,
     pristine: true,

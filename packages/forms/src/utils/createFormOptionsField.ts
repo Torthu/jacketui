@@ -17,6 +17,7 @@ export function createFormOptionsField<T extends string>(
 ): FormOptionsField<T> {
   return {
     options,
+    initialOptions: options,
     ...createFormField(initialValue, field),
   };
 }
