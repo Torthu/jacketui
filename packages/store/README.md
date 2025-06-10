@@ -23,21 +23,51 @@ An action handler is essentially the same as a reducer in e.g useReducer. It is 
 
 When setting up the store, you pass an array of action handlers, please note that the order is important since earlier action handlers will impact the state passed to later action handlers.
 
-### Synchronous action handlers
+### Reducers - synchronous action handlers
 
-Exactly the same as a reducer. `(state, action) => state`.
+A reducer is a synchronous function that takes a state, and action and returns a new state: `(state, action) => state`.
 
-JacketUI Store expects an array of action handlers, but you may choose to create one large one - perhaps reuse the reducer you already have if migrating from useReducer.
+This is the same concept, and same function signature, as in useReducer.
 
-### Asynchronous action handlers
+#### Combine Reducers
 
-Asynchonous action handlers work similarly to sagas. `(getState, action, commit, dispatch) => void`
+If you have multiple reducers, you can combine them into one using the combineReducers function:
 
-**getState()**: A function for getting the current state. Since the async action handler works over time, you should call this function in order to get the current state of the store whenever you want to set a new state.
+```
+const combinedReducer = combineReducers(reducer1, reducer2, reducer3);
+```
 
-**commit(newState)**: function for setting a new state in the store. Wraps store.setState.
+### Effects - asynchronous action handlers
 
-**dispatch(action)**: the store's dispatch-function. Useful if you want to trigger e.g synchronous action handlers as a result of some API-result.
+Effects are asynchronous functions that can be used to perform side effects, such as fetching data from an API.
+
+Effects are designed to solve side effects such as data fetching, file saving, or any other work that is not necessarily expected to return a new state.
+
+Their function signature is designed to be dissimilar to the Reducers in order to easily differentiate them:
+
+```
+const effect: Effect<State, Action> = async ({getState, setState, dispatch, action}) => {}
+```
+
+## Debugging and dev tools
+
+The store can be connected to the Redux DevTools extension.
+
+In a React context, simply use the provided hook:
+
+```
+const [state, dispatch, store] = useStore(actionHandlerArray, initialState);
+useDevtools(store, {name: "My Store Name"})
+```
+
+In other contexts you can use the `connectDevtools` function:
+
+```
+const store = new Store({ initialState, actionHandlers });
+
+// Remember to disconnect at the end of the lifecycle of the store
+const disconnect = connectDevtools(store, {name: "My Store Name"});
+```
 
 ## Installation
 
@@ -54,3 +84,7 @@ If you are using React, you can use the included useStore hook instead: `const [
 ## Architecture
 
 ![Data Flow](docs/DataFlow.png)
+
+```
+
+```
