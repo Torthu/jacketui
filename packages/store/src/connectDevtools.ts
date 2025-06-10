@@ -20,7 +20,10 @@ const defaultOptions = {
 let connections: Record<string, any> = {};
 
 /** connectDevtools
+ *
  *  Connects a store to the Redux Devtools extension
+ *
+ * @note This hook requires the Redux Devtools extension to be installed in your browser: {@link https://github.com/reduxjs/redux-devtools}
  *
  * @param store The store to connect
  * @returns [unsubscribe] A function to disconnect the store
