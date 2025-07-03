@@ -12,7 +12,7 @@ import { BringInitDecorator } from "../types/BringDecorator";
  * @returns BringDecorator
  */
 export const headers = (
-  headers: Record<string, string> | Headers
+  headers: Record<string, string | number> | Headers
 ): BringInitDecorator => {
   return (init) => {
     init.headers ??= new Headers();
