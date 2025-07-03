@@ -21,8 +21,8 @@
   },
   "license": "GPL-3.0-only",
   "devDependencies": {
-    "vitest": "^3.0.6",
-    "typescript": "^5.3.2"
+    "vitest": "^3.1.2",
+    "typescript": "^5.8.3"
   },
   "dependencies": {
     "@torthu/jacketui-core": "latest"

@@ -1,6 +1,6 @@
 {
   "name": "@torthu/jacketui-router",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Simple Router implementation.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -16,8 +16,8 @@
     "regexparam": "^3.0.0"
   },
   "devDependencies": {
-    "@types/react": "^19.0.3",
-    "react": "19.0.0",
+    "@types/react": "^19.1.2",
+    "react": "19.1.0",
     "tailwind-merge": "latest"
   },
   "scripts": {
