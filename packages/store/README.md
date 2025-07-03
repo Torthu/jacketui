@@ -2,6 +2,12 @@
 
 Store based on thinking from [compassionate components](https://www.youtube.com/watch?v=VKQAS3PNEVw&pp=ygUYY29tcGFzc2lvbmF0ZSBjb21wb25lbnRz).
 
+## Installation
+
+Requires Typescript.
+
+`npm i --save @torthu/jacketui-store`
+
 ## Philosophy
 
 We want flexibility in our components and escape hatches in order to solve edge cases and make components truly expandable and reusable.
@@ -68,12 +74,6 @@ const store = new Store({ initialState, actionHandlers });
 // Remember to disconnect at the end of the lifecycle of the store
 const disconnect = connectDevtools(store, {name: "My Store Name"});
 ```
-
-## Installation
-
-Requires Typescript.
-
-`npm i --save @torthu/jacketui-store`
 
 ## Usage
 
