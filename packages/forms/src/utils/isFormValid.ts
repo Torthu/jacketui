@@ -2,9 +2,9 @@ import { isFormField } from "../types";
 
 export const isFormValid = <S extends object>(
   state: S,
-  keys?: keyof S[]
+  keys?: Array<keyof S>
 ): boolean => {
-  keys = keys ?? (Object.keys(state) as unknown as keyof S[]);
+  keys = keys ?? (Object.keys(state) as unknown as Array<keyof S>);
 
   return (keys as unknown as string[]).reduce((valid, key) => {
     const candidate = state[key as keyof S];

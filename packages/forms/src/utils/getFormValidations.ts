@@ -21,9 +21,9 @@ import {
 export const getFormValidations = <S extends object>(
   state: S,
   { source = "all", severity = "all" }: FieldValidationFilterOptions = {},
-  fieldNames?: keyof S[]
+  fieldNames?: Array<keyof S>
 ): (Validation & { fieldName: string })[] => {
-  fieldNames = fieldNames ?? (Object.keys(state) as unknown as keyof S[]);
+  fieldNames = fieldNames ?? (Object.keys(state) as unknown as Array<keyof S>);
 
   return (fieldNames as unknown as string[])
     .map((key) => {
