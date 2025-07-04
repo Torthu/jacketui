@@ -55,6 +55,14 @@ Their function signature is designed to be dissimilar to the Reducers in order t
 const effect: Effect<State, Action> = async ({getState, setState, dispatch, action}) => {}
 ```
 
+### Selectors - retrieves a View from the state
+
+A selector is a function that takes the state and returns a view (subset or manipulated version) of the state.
+
+### Slices - a View and its update callback
+
+A slice is a view of the state, and a callback that is called when the view changes.
+
 ## Debugging and dev tools
 
 The store can be connected to the Redux DevTools extension.
