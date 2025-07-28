@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { BasicAction, SliceSelector } from "./types";
 import { Store } from "./Store";
 import { Slice } from "./Slice";
+import { referenceComparison } from "./comparison";
 
 /** **useSlice**(store, selector)
  *
@@ -11,6 +12,7 @@ import { Slice } from "./Slice";
  *
  * @param store {@link Store} instance
  * @param selector {@link SliceSelector} function for selecting the view from the state
+ * @param compareFunction function for comparing old and new view. Defaults to {@link referenceComparison}. View is updated only if this function returns `true`.
  * @returns View
  */
 export function useSlice<

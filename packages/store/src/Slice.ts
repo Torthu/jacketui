@@ -8,7 +8,8 @@ import { BasicAction, SliceSelector } from "./types";
  *
  * @param store {@link Store}<State, Action>
  * @param selector {@link SliceSelector}<State>
- * @param onUpdate {(newView: View) => void}
+ * @param onUpdate {(newView: View) => void} - Callback that triggers when the view has changed
+ * @param compareFunction {(a: View, b: View) => boolean} - Function to compare old and new state. Default is {@link referenceComparison}. Return true if state has changed.
  * @return {@link Slice}<State, Action, View>
  */
 export class Slice<State extends object, Action extends BasicAction, View> {
