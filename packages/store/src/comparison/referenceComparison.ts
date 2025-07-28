@@ -3,7 +3,7 @@
  * This is the default comparison function.
  * @param {State} oldState
  * @param {State} newState
- * @returns {boolean} is equal
+ * @returns {boolean} is not equal
  */
 export const referenceComparison = <State>(
   oldState: State,

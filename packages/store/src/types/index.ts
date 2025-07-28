@@ -4,4 +4,6 @@ export * from "./BasicAction";
 export * from "./Dispatch";
 export * from "./Effect";
 export * from "./Reducer";
+export * from "./Selector";
+export * from "./SliceSelector";
 export * from "./StoreBroadcastAction";

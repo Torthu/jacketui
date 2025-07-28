@@ -1,15 +1,15 @@
 import {
   Broadcast,
   BroadcastCallbackFunction,
-  BroadcastEvent,
 } from "@torthu/jacketui-broadcast";
 import { referenceComparison } from "./comparison/referenceComparison";
 import { isAsyncReducer, isEffect, isReducer } from "./guards";
 import { ActionHandler } from "./types/ActionHandler";
 import { BasicAction } from "./types/BasicAction";
 import { StoreBroadcastAction } from "./types/StoreBroadcastAction";
-import { Effect } from "./types/Effect";
-import { Reducer } from "./types/Reducer";
+import { Selector } from "./types/Selector";
+import { Slice } from "./Slice";
+import { SliceSelector } from "./types";
 
 interface StateChangedCallback<State> {
   (getState: () => State): void;
@@ -35,9 +35,55 @@ interface StoreConstructorProps<
 export class Store<State extends object, Action extends BasicAction> {
   private _actionHandlers: ActionHandler<State, Action>[];
 
+  /** createSelector
+   *
+   * Create a selector function for the store.
+   * A selector function is a function that takes the state and returns some kind of subset or parsed "View" of the state.
+   *
+   * The selector function is called with the current state and the filters passed to the selector function.
+   *
+   *
+   * @param selector {@link Selector}<State, Filters, View> - The selector function.
+   * @return (...filters: Filters) => View
+   *
+   * @example
+   *   const store = new Store<State, Action>({ initialState, actionHandlers });
+   *   const someStoreView = store.createSelector((state, filter: string) => state.filter(filter));
+   *   console currentView = someStoreView("someFilter");
+   */
+  public createSelector<Filters extends unknown[], View>(
+    selector: Selector<State, Filters, View>
+  ): (...filters: Filters) => View {
+    return (...filters) => selector(this.getState(), ...filters);
+  }
+
+  /** createSlice
+   *
+   * A Slice is a self-updating View of the store, based on a selector function.
+   *
+   * A View is some value based on the state. It can be e.g. the state itself, a subset, or some kind of parsed value.
+   *
+   * @param selector {@link SliceSelector}
+   * @param onUpdate (newViewState: View) => void
+   * @returns {@link Slice}<State, Action, View>
+   *
+   * @example
+   *   const store = new Store<State, Action>({ initialState, actionHandlers });
+   *   const slice = store.createSlice((state) => state.someProp, (newViewState) => console.log(newViewState));
+   */
+  public createSlice<View>(
+    selector: SliceSelector<State, View>,
+    onUpdate: (newViewState: View) => void,
+    compareFunction: (
+      oldState: View,
+      newState: View
+    ) => boolean = referenceComparison<View>
+  ): Slice<State, Action, View> {
+    return new Slice(this, selector, onUpdate, compareFunction);
+  }
+
   private _state: State;
   private _broadcast: Broadcast<StoreBroadcastAction<State, Action>>;
-
   private _compareFunction: (oldState: State, newState: State) => boolean;
 
   /** cloneDeep
