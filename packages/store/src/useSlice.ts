@@ -17,13 +17,17 @@ export function useSlice<
   State extends object,
   Action extends BasicAction,
   View
->(store: Store<State, Action>, selector: SliceSelector<State, View>): View {
+>(
+  store: Store<State, Action>,
+  selector: SliceSelector<State, View>,
+  compareFunction?: (a: View, b: View) => boolean
+): View {
   const [view, setView] = useState(() => selector(store.getState()));
   const sliceRef = useRef<Slice<State, Action, View> | null>(null);
 
   useEffect(() => {
     // Create the slice and set the update callback
-    const slice = store.createSlice(selector, setView);
+    const slice = store.createSlice(selector, setView, compareFunction);
     sliceRef.current = slice;
 
     // Clean up on unmount

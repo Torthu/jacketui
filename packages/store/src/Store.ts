@@ -73,14 +73,17 @@ export class Store<State extends object, Action extends BasicAction> {
    */
   public createSlice<View>(
     selector: SliceSelector<State, View>,
-    onUpdate: (newViewState: View) => void
+    onUpdate: (newViewState: View) => void,
+    compareFunction: (
+      oldState: View,
+      newState: View
+    ) => boolean = referenceComparison<View>
   ): Slice<State, Action, View> {
-    return new Slice(this, selector, onUpdate);
+    return new Slice(this, selector, onUpdate, compareFunction);
   }
 
   private _state: State;
   private _broadcast: Broadcast<StoreBroadcastAction<State, Action>>;
-
   private _compareFunction: (oldState: State, newState: State) => boolean;
 
   /** cloneDeep
