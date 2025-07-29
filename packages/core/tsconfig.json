@@ -1,9 +1,19 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "extends": "../../tsconfig.common.json",
 
   "compilerOptions": {
-    "outDir": "dist"
+    "outDir": "dist",
+    "strict": true,
+    "target": "ES2022",
+    "allowJs": true,
+    "module": "ES6",
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "noImplicitAny": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "jsx": "react-jsx",
+    "declaration": true
   },
 
   "include": ["src/**/*.ts", "src/**/*.tsx"],
