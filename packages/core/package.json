@@ -15,9 +15,9 @@
     "name": "Torstein Thune",
     "url": "https://thune.io"
   },
-  "license": "GPL-3.0-only",
   "devDependencies": {
     "typescript": "^5.8.3",
     "vitest": "^3.1.2"
-  }
+  },
+  "license": "LGPL-3.0-only"
 }

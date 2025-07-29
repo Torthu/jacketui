@@ -23,5 +23,5 @@
     "build": "rimraf ./dist && tsc",
     "test": "exit 0"
   },
-  "license": "GPL-3.0-only"
+  "license": "LGPL-3.0-only"
 }
