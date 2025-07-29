@@ -126,7 +126,7 @@ export const bring = (init: BringInit | BringError) => {
 
         onTimeout?.(timeoutError);
         onError?.(timeoutError);
-        return resolve(failure(error));
+        return resolve(failure(timeoutError));
       }
 
       if (error instanceof Error) {
