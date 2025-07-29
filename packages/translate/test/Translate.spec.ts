@@ -1,4 +1,5 @@
 import { Translate } from "../src";
+import { describe, expect, it, beforeAll } from "vitest";
 
 // const translate = new Translate({
 //   languages: {

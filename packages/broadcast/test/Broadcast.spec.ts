@@ -1,5 +1,7 @@
 import { Broadcast } from "../src/Broadcast";
 
+import { describe, it, expect, vi } from "vitest";
+
 describe("Broadcast", () => {
   describe("init", () => {
     it("should instantiate Broadcast", () => {
@@ -19,7 +21,7 @@ describe("Broadcast", () => {
 
     it("should be able to subscribe to event and trigger", () => {
       const broadcast = new Broadcast();
-      const callback = jest.fn();
+      const callback = vi.fn();
       broadcast.on("someEventKey", callback);
       broadcast.emit({ type: "someEventKey" });
 
@@ -28,7 +30,7 @@ describe("Broadcast", () => {
 
     it("should be able to subscribe to event and unsubscribe", () => {
       const broadcast = new Broadcast();
-      const callback = jest.fn();
+      const callback = vi.fn();
       broadcast.on("someEventKey", callback);
       broadcast.off("someEventKey", callback);
       broadcast.emit({ type: "someEventKey" });
@@ -38,7 +40,7 @@ describe("Broadcast", () => {
 
     it("should be able to subscribe to event and unsubscribe all", () => {
       const broadcast = new Broadcast();
-      const callback = jest.fn();
+      const callback = vi.fn();
       broadcast.on("someEventKey", callback);
       broadcast.offAll("someEventKey");
       broadcast.emit({ type: "someEventKey" });
@@ -48,7 +50,7 @@ describe("Broadcast", () => {
 
     it("should be able to subscribe to event and trigger only once", () => {
       const broadcast = new Broadcast();
-      const callback = jest.fn();
+      const callback = vi.fn();
       broadcast.once("triggerOnce", callback);
       broadcast.emit({ type: "triggerOnce" });
       broadcast.emit({ type: "triggerOnce" });
@@ -58,8 +60,8 @@ describe("Broadcast", () => {
 
     it("should be able to have multiple subscribers", () => {
       const broadcast = new Broadcast();
-      const callback1 = jest.fn();
-      const callback2 = jest.fn();
+      const callback1 = vi.fn();
+      const callback2 = vi.fn();
       broadcast.on("someEventKey", callback1);
       broadcast.on("someEventKey", callback2);
 
@@ -71,8 +73,8 @@ describe("Broadcast", () => {
 
     it("should be able to have multiple subscribers and unsubscribe one", () => {
       const broadcast = new Broadcast();
-      const callback1 = jest.fn();
-      const callback2 = jest.fn();
+      const callback1 = vi.fn();
+      const callback2 = vi.fn();
       broadcast.on("someEventKey", callback1);
       broadcast.on("someEventKey", callback2);
 
@@ -86,8 +88,8 @@ describe("Broadcast", () => {
 
     it("should be able to have multiple subscribers and unsubscribe all", () => {
       const broadcast = new Broadcast();
-      const callback1 = jest.fn();
-      const callback2 = jest.fn();
+      const callback1 = vi.fn();
+      const callback2 = vi.fn();
       broadcast.on("someEventKey", callback1);
       broadcast.on("someEventKey", callback2);
 
@@ -101,8 +103,8 @@ describe("Broadcast", () => {
 
     it("should be able to have multiple subscribers and trigger only once", () => {
       const broadcast = new Broadcast();
-      const callback1 = jest.fn();
-      const callback2 = jest.fn();
+      const callback1 = vi.fn();
+      const callback2 = vi.fn();
       broadcast.once("triggerOnce", callback1);
       broadcast.once("triggerOnce", callback2);
 
