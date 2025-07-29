@@ -1,13 +1,4 @@
-import {
-  describe,
-  beforeEach,
-  afterEach,
-  test,
-  it,
-  vi,
-  expect,
-  Mock,
-} from "vitest";
+import { describe, it, vi, expect } from "vitest";
 import { Store, md5Comparison } from "../src";
 
 type State = { a: string };
@@ -342,7 +333,10 @@ describe("Store", () => {
         initialState: { a: "A" },
         actionHandlers: [(state: State, action: Action) => ({ a: "B" })],
       });
-      const slice = model.createSlice((state) => state.a);
+      const slice = model.createSlice(
+        (state) => state.a,
+        (v) => null
+      );
       const value = slice.state;
       expect(value).toBe("A");
 
