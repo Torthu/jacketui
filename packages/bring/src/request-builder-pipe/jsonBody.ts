@@ -8,5 +8,5 @@ import { BringInitDecorator } from "../types/BringDecorator";
  * @returns BringInitDecorator
  */
 export const jsonBody =
-  (body: any): BringInitDecorator =>
+  <BodyType = any>(body: BodyType): BringInitDecorator =>
   (init) => ({ ...init, body: JSON.stringify(body) });
