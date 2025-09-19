@@ -1,6 +1,6 @@
 {
   "name": "@torthu/jacketui-bring",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Improved fetch API with retry, timeout, and more.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -20,5 +20,5 @@
     "build": "rimraf ./dist && tsc",
     "test": "vitest run"
   },
-  "license": "GPL-3.0-only"
+  "license": "LGPL-3.0-only"
 }
