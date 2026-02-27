@@ -3,3 +3,5 @@ export * from "./tryFetch";
 export * from "./errors";
 export * from "./request-builder-pipe";
 export * from "./response-pipe";
+
+export type { BringInit } from "./types/BringInit";
